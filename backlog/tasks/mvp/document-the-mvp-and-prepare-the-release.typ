@@ -8,7 +8,11 @@
   kind: "docs",
   assignee: "agent",
   estimate: (src-files: 1),
-  status: wip(2026, 11, 4),
+  status: done(
+    2026,
+    11,
+    4,
+  )[MVP documented and gates green; cargo publish dry-run passes; release blocked: no origin remote.],
   links: parent("ship-the-nix-bump-preview-mvp.typ")
     + depends-on("add-end-to-end-tests-with-a-fake-nix.typ"),
 )
