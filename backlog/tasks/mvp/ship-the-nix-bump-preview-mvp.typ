@@ -8,7 +8,11 @@
   kind: "milestone",
   assignee: "agent",
   estimate: (src-files: 0),
-  status: proposed(2026, 11, 4),
+  status: done(
+    2026,
+    11,
+    4,
+  )[All nine MVP tasks landed; just check, cover, and crap green; release blocked only by the missing origin remote.],
   links: depends-on(
     "implement-the-cli-contract-and-json-report-schema.typ",
     "resolve-a-proposed-lock-without-writing-flake-lock.typ",
