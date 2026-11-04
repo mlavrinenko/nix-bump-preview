@@ -1,3 +1,5 @@
+grown: -58.6 KiB
 libfoo: 1.0.drv → 1.1.drv
 newpkg: ∅ → 2.0.drv
 oldpkg: 3.0.drv → ∅
+shrunk: 58.6 KiB

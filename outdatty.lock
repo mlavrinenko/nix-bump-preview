@@ -11,7 +11,8 @@ groups:
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   delta-pipeline:
     source:
-      src/delta.rs: 7ec107842d96b136393de403a611c2bbae8d1e319b4b1ef4b63e35756731900f
+      src/delta.rs: 69fe19378262c4bfbfb0ad6aa4da28005797b0366949b667cc9ca5cc8b9677b9
+      src/delta_tests.rs: e7cc40fa322332c21573e8d7be5cb4f68ddde051d9b4385a9fe5283b2627cc9b
     dependents:
       docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
       docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
