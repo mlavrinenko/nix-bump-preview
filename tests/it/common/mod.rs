@@ -3,6 +3,9 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, SystemTime};
 
+use assert_cmd::Command;
+pub mod e2e;
+
 use nix_bump_preview::cli::{Cli, OutputFormat};
 use nix_bump_preview::lock;
 use nix_bump_preview::nix::{Nix, NixCommand};
@@ -154,6 +157,23 @@ pub struct Harness {
     log: PathBuf,
 }
 
+fn copy_dir(from: &Path, to: &Path) {
+    fs::create_dir_all(to).expect("fixture directory should be creatable");
+    for entry in fs::read_dir(from).expect("fixture directory should be readable") {
+        let entry = entry.expect("fixture entry should be readable");
+        let target = to.join(entry.file_name());
+        if entry
+            .file_type()
+            .expect("fixture entry type should be readable")
+            .is_dir()
+        {
+            copy_dir(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), &target).expect("fixture file should be copyable");
+        }
+    }
+}
+
 impl Harness {
     pub fn new(label: &str, before_fixture: &str) -> Self {
         let dir = TestDir::new(label);
@@ -161,6 +181,17 @@ impl Harness {
         fs::create_dir_all(&flake).expect("flake directory should be creatable");
         fs::copy(fixture(before_fixture), flake.join("flake.lock"))
             .expect("before lock fixture should be copyable");
+        Self::with_flake(dir, flake)
+    }
+
+    pub fn from_flake(label: &str, flake_fixture: &str) -> Self {
+        let dir = TestDir::new(label);
+        let flake = dir.path().join("flake");
+        copy_dir(&fixture(flake_fixture), &flake);
+        Self::with_flake(dir, flake)
+    }
+
+    fn with_flake(dir: TestDir, flake: PathBuf) -> Self {
         let scenario = dir.path().join("scenario");
         let log = dir.path().join("argv.log");
         let cli = cli_for(&flake);
@@ -171,6 +202,20 @@ impl Harness {
             scenario,
             log,
         }
+    }
+
+    pub fn command_with_nix(&self, bin: &Path) -> Command {
+        let mut command = Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("binary should build");
+        command
+            .arg("--nix-bin")
+            .arg(bin)
+            .env("FAKE_NIX_SCENARIO", &self.scenario)
+            .env("FAKE_NIX_LOG", &self.log);
+        command
+    }
+
+    pub fn command(&self) -> Command {
+        self.command_with_nix(&fake_nix())
     }
 
     pub fn flake(&self) -> &Path {
@@ -259,4 +304,50 @@ pub fn assert_untouched(path: &Path, bytes: &[u8], mtime: SystemTime) {
             .expect("mtime should be available"),
         mtime
     );
+}
+
+fn assert_flag(args: &[String], flag: &str) {
+    assert!(
+        args.iter().any(|arg| arg == flag),
+        "safe form is missing {flag}: {args:?}"
+    );
+}
+
+pub fn assert_safe_form(args: &[String]) -> &'static str {
+    for forbidden in ["switch", "boot", "test", "activate", "apply", "profile"] {
+        assert!(
+            !args.iter().any(|arg| arg == forbidden),
+            "activation command in argv: {args:?}"
+        );
+    }
+    match (
+        args.first().map(String::as_str),
+        args.get(1).map(String::as_str),
+    ) {
+        (Some("flake"), Some("update")) => {
+            assert_flag(args, "--flake");
+            assert_flag(args, "--output-lock-file");
+            "flake update"
+        }
+        (Some("path-info"), _) => {
+            assert_flag(args, "--derivation");
+            assert_flag(args, "--no-write-lock-file");
+            "path-info"
+        }
+        (Some("store"), Some("diff-closures")) => {
+            assert_flag(args, "--derivation");
+            "store diff-closures"
+        }
+        (Some("build"), _) => {
+            assert_flag(args, "--dry-run");
+            assert_flag(args, "--no-write-lock-file");
+            "build"
+        }
+        (Some("eval"), _) => {
+            assert_flag(args, "--raw");
+            assert_flag(args, "--no-write-lock-file");
+            "eval"
+        }
+        _ => panic!("undocumented nix invocation: {args:?}"),
+    }
 }

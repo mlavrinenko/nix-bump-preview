@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "alpha-cache": {
+      "locked": {
+        "lastModified": 1792094642,
+        "narHash": "sha256-alpha-before",
+        "owner": "example",
+        "repo": "alpha-cache",
+        "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "example",
+        "ref": "main",
+        "repo": "alpha-cache",
+        "type": "github"
+      }
+    },
+    "alpha-stable": {
+      "locked": {
+        "lastModified": 1792000000,
+        "narHash": "sha256-alpha-stable",
+        "owner": "example",
+        "repo": "alpha-stable",
+        "rev": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "example",
+        "ref": "stable",
+        "repo": "alpha-stable",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "alpha-cache": "alpha-cache",
+        "alpha-stable": "alpha-stable"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

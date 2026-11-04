@@ -2,6 +2,7 @@ mod cli;
 mod common;
 mod cost;
 mod delta;
+mod e2e;
 mod errors;
 mod eval;
 mod lock;

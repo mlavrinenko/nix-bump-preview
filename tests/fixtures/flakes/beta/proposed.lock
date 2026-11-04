@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "beta-cache": {
+      "locked": {
+        "lastModified": 1792773339,
+        "narHash": "sha256-beta-after",
+        "owner": "example",
+        "repo": "beta-cache",
+        "rev": "3333333333333333333333333333333333333333",
+        "type": "github"
+      },
+      "original": {
+        "owner": "example",
+        "ref": "main",
+        "repo": "beta-cache",
+        "type": "github"
+      }
+    },
+    "beta-pinned": {
+      "locked": {
+        "lastModified": 1792000000,
+        "narHash": "sha256-beta-pinned",
+        "owner": "example",
+        "repo": "beta-pinned",
+        "rev": "2222222222222222222222222222222222222222",
+        "type": "github"
+      },
+      "original": {
+        "owner": "example",
+        "ref": "pinned",
+        "repo": "beta-pinned",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "beta-cache": "beta-cache",
+        "beta-pinned": "beta-pinned"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

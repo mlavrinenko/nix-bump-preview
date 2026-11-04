@@ -10,7 +10,9 @@ use nix_bump_preview::eval;
 use nix_bump_preview::nix::{Nix, NixCommand};
 use temp_env::with_var;
 
-use crate::common::{Harness, Response, assert_untouched, fixture, pin_mtime, temp_lock};
+use crate::common::{
+    Harness, Response, assert_safe_form, assert_untouched, fixture, pin_mtime, temp_lock,
+};
 
 const SYSTEM: &str = "nixosConfigurations.example.config.system.build.toplevel";
 const PACKAGE: &str = "packages.example";
@@ -160,52 +162,6 @@ fn nix_bin_precedence_is_flag_then_environment_then_default() {
             .expect("the flag should parse");
         assert_eq!(from_flag.nix_bin, PathBuf::from("flag-nix"));
     });
-}
-
-fn assert_flag(args: &[String], flag: &str) {
-    assert!(
-        args.iter().any(|arg| arg == flag),
-        "safe form is missing {flag}: {args:?}"
-    );
-}
-
-fn assert_safe_form(args: &[String]) -> &'static str {
-    for forbidden in ["switch", "boot", "test", "activate", "apply", "profile"] {
-        assert!(
-            !args.iter().any(|arg| arg == forbidden),
-            "activation command in argv: {args:?}"
-        );
-    }
-    match (
-        args.first().map(String::as_str),
-        args.get(1).map(String::as_str),
-    ) {
-        (Some("flake"), Some("update")) => {
-            assert_flag(args, "--flake");
-            assert_flag(args, "--output-lock-file");
-            "flake update"
-        }
-        (Some("path-info"), _) => {
-            assert_flag(args, "--derivation");
-            assert_flag(args, "--no-write-lock-file");
-            "path-info"
-        }
-        (Some("store"), Some("diff-closures")) => {
-            assert_flag(args, "--derivation");
-            "store diff-closures"
-        }
-        (Some("build"), _) => {
-            assert_flag(args, "--dry-run");
-            assert_flag(args, "--no-write-lock-file");
-            "build"
-        }
-        (Some("eval"), _) => {
-            assert_flag(args, "--raw");
-            assert_flag(args, "--no-write-lock-file");
-            "eval"
-        }
-        _ => panic!("undocumented nix invocation: {args:?}"),
-    }
 }
 
 #[test]
