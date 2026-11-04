@@ -1,8 +1,8 @@
 # .mindtape/config.toml — nix-bump-preview's MVP backlog.
 #
-# The task shape is deliberately small: Summary, Goals, Acceptance criteria,
-# Non-goals, Files. Every open task names the product and process goals it
-# serves, so a session can reject work that helps nothing.
+# The task shape is deliberately small: Summary, Acceptance criteria,
+# Non-goals, Files. Every open task rates the product and process goals in
+# `x-goals`, so a session can reject work that helps nothing.
 #
 # This file is project-generic. No personal host, flake or path belongs here.
 
@@ -54,6 +54,10 @@ path = "backlog/tasks/mvp"
 name = "nbp"
 derive-tags = true
 
+[[typst.local-packages]]
+name = "nix-bump-preview"
+path = "truth"
+
 [tasks.derive-tags]
 enabled = true
 collect = ["segments"]
@@ -91,6 +95,8 @@ allowed = [
   "tests",
   "docs",
   "tooling",
+  "release",
+  "install",
   "decision",
   "found",
   "tweak",
@@ -99,18 +105,12 @@ allowed = [
 [tasks.comments]
 policy = "forbid"
 
-# Body sections. A task that cannot name its goals is not ready to start.
+# Body sections. A task that cannot rate its goals is not ready to start.
 [[tasks.body.headers.rules]]
 path = ["Summary"]
 action = "unique"
 when = "!terminal"
 message = "keep exactly one Summary section, stating the problem once"
-
-[[tasks.body.headers.rules]]
-path = ["Goals"]
-action = "unique"
-when = "!terminal"
-message = "add one Goals section naming the product and process goals this task serves"
 
 [[tasks.body.headers.rules]]
 path = ["Acceptance criteria"]
@@ -133,14 +133,8 @@ message = "add a Files section listing the paths the task expects to touch"
 [[tasks.body.headers.rules]]
 action = "order"
 before = ["Summary"]
-after = ["Goals"]
-message = "move Summary before Goals"
-
-[[tasks.body.headers.rules]]
-action = "order"
-before = ["Goals"]
 after = ["Acceptance criteria"]
-message = "move Goals before Acceptance criteria"
+message = "move Summary before Acceptance criteria"
 
 [[tasks.body.headers.rules]]
 action = "order"
@@ -154,12 +148,11 @@ before = ["Non-goals"]
 after = ["Files"]
 message = "move Non-goals before Files"
 
-[[tasks.body.content.rules]]
-name = "goals-non-empty"
-path = ["Goals"]
-assert = "non-empty"
+[[tasks.rules]]
+name = "goals"
 when = "!terminal"
-message = "name the product and process goals this task serves, or say why it serves none"
+check = { typst = "truth/lib.typ", function = "check-goals", field = "x-goals" }
+severity = "error"
 
 [[roles]]
 name = "maintainer"

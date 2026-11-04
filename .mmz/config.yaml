@@ -86,7 +86,7 @@ scopes:
   tasks:
     - ".mindtape/config.toml"
     - ".mindtape/templates/**"
-    - "docs/goals.md"
+    - "truth/**"
     - "docs/design.md"
     - "docs/report.md"
 
@@ -110,7 +110,8 @@ scopes:
     - ".gitattributes"
     - ".just/scripts/**"
 
-  # Shared by every rule: the recipe bodies (Justfile), the dev shell they all
+  # Shared by every rule: the recipe bodies (Justfile and .just/scripts/), the
+  # dev shell they all
   # run in (flake.nix/flake.lock), and this manifest, which defines what "fresh"
   # even means. Every formatter, linter and cargo tool comes from that shell, so
   # a toolchain or tool-set bump must re-run every gate, machete included — and
@@ -125,6 +126,7 @@ scopes:
   # survives an edit to it.
   gates-meta:
     - "Justfile"
+    - ".just/scripts/**"
     - ".config/nextest.toml"
     - "flake.nix"
     - "flake.lock"
@@ -177,7 +179,7 @@ commands:
   # lock; `outdatty-config` covers the lock and the group definitions directly.
   - name: just outdatty-check
     tags: [gate]
-    inputs: [outdatty-config, rust, schema, docs, tooling-meta, gates-meta]
+    inputs: [outdatty-config, rust, schema, docs, tasks, tooling-meta, gates-meta]
 
   # Untagged from here down: these run outside `just check` (CI runs them in
   # their own job), so they stay out of the gate set. Memoized only so a no-op

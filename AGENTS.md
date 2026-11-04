@@ -2,9 +2,10 @@
 
 ## Project Rules
 
-- The product and process goals live in [docs/goals.md](docs/goals.md). Every
-  open task names the goals it serves in its `Goals` section. A task that
-  serves none is not ready to start.
+- The product and process goals live in [truth/goals.typ](truth/goals.typ) and
+  [truth/process-goals.typ](truth/process-goals.typ), checked by
+  [truth/lib.typ](truth/lib.typ). Every open task rates each goal in its
+  `x-goals` field. A task that serves none is not ready to start.
 - The command and safety contract lives in [docs/design.md](docs/design.md).
   The delta, cost, JSON, text, and test contract lives in
   [docs/report.md](docs/report.md). Change the contract and its examples in the
@@ -27,11 +28,11 @@
 
 ## Agent Rules
 
-- See and use [Justfile](Justfile). Add any repeatable and regular operations there.
-  `set shell` already gives every recipe line `bash -eo pipefail`, so a new recipe
-  needs no `#!/usr/bin/env bash` + `set -eo pipefail` preamble. just runs each line
-  in a fresh shell though — add a shebang only when the body needs one shell across
-  lines (a variable read back later, a `trap`).
+- See and use [Justfile](Justfile). Add any repeatable and regular operations
+  there. Every public recipe carries a `[doc("...")]` attribute and a group, and
+  the Justfile holds no comments. A body that needs more than a line or two
+  lives in [.just/scripts/](.just/scripts/) instead. `set shell` gives every
+  recipe line `bash -eo pipefail`, so a one-line recipe needs no preamble.
 - At the end ensure that `just fix-check` is green.
 - Tests: inline `#[cfg(test)]` units; CLI/integration in `tests/it/` (`assert_cmd` + `predicates`), one test binary: a new file is `tests/it/<name>.rs` plus `mod <name>;` in `tests/it/main.rs`, never a new top-level `tests/<name>.rs`. `just fix-check` auto-ejects inline tests from oversized files via `ejectest`.
 - Coverage and CRAP gates run separately (CI + `just validate`): `just cover`
@@ -78,7 +79,10 @@
   red run leaves main pushed and no tag, and a re-run after fixing it changes
   nothing the first run did. A release whose workflow failed
   is finished on the same tag with `gh workflow run <release workflow> -f
-  tag=vX.Y.Z`; a pushed tag never moves.
+  tag=vX.Y.Z`; a pushed tag never moves. The workflow publishes through
+  crates.io Trusted Publishing, so configure a Trusted Publisher (owner,
+  repository, workflow file, environment `crates-io`) before the first tag.
+  There is no long-lived registry token secret.
 - Delegated work forks with `just fork <slug>` (a sibling worktree on a new
   branch, dev shell allowed) and lands with `just land` run in that worktree:
   it gates, fast-forwards main and removes the worktree. Both wrap

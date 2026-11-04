@@ -9,9 +9,9 @@ rust-version = "1.85"
 description = "Preview a Nix flake input bump: package version deltas and build cost, without building or switching"
 license = "MIT"
 repository = "https://github.com/mlavrinenko/nix-bump-preview"
-keywords = []
-categories = ["command-line-utilities"]
-include = ["/src/", "/schema/", "/LICENSE*", "/README.md", "/CHANGELOG.md"]
+keywords = ["nix", "nixos", "flake", "nixpkgs", "update"]
+categories = ["command-line-utilities", "development-tools"]
+include = ["/src/", "/schema/", "/tests/", "/LICENSE*", "/README.md", "/CHANGELOG.md"]
 
 [lib]
 name = "nix_bump_preview"

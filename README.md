@@ -23,16 +23,6 @@ installable nixosConfigurations.example.config.system.build.toplevel
 warning: the delta is the build-time derivation graph, not the runtime closure
 ```
 
-## Status
-
-The MVP is implemented. The tool resolves a proposed lock, evaluates
-installables and attrs, reports the build-graph delta and the dry-run cost, and
-renders text or JSON without building or switching. The MVP work is tracked in
-[`backlog/tasks/mvp/`](backlog/tasks/mvp/). The product and process goals are in
-[`docs/goals.md`](docs/goals.md), the command and safety contract is in
-[`docs/design.md`](docs/design.md), and the report contract is in
-[`docs/report.md`](docs/report.md).
-
 ## Usage
 
 ```text
@@ -59,10 +49,6 @@ directory containing `flake.lock`.
 | `--no-cost` | Skip the build and fetch cost and its Nix call |
 | `--exit-code` | Exit 1 when a change or build cost exists, else 0 |
 
-`--nix-bin` and `--print-schema` are hidden. The first selects the Nix
-executable, and the flag wins over `NIX_BIN`; the second prints the committed
-JSON schema and exits.
-
 ## How it works
 
 1. Resolve a proposed lock with `nix flake update --output-lock-file`.
@@ -75,6 +61,10 @@ JSON schema and exits.
 
 `--lock-file` skips step 1 and previews a lock you already resolved.
 
+The version delta comes from the build-time derivation graph, not the runtime
+closure. It over-reports build-only inputs, and an exact runtime closure needs
+built or substituted outputs. The report carries that warning.
+
 ## JSON
 
 `--format json` is the scripting surface. It is schema-backed at
@@ -86,43 +76,24 @@ jq '.installables[] | {attr, changes: .delta.changes, cost}' \
   tests/fixtures/reports/example.json
 ```
 
-## Limits
-
-The version delta comes from the build-time derivation graph. It over-reports
-build-only inputs, and it cannot show the exact runtime closure without built
-or substituted outputs. The report and the README say so; the tool never
-pretends the approximation is exact.
-
 ## Install
 
-```bash
-cargo install nix-bump-preview
+Add the flake as an input:
+
+```nix
+inputs.nix-bump-preview.url = "github:mlavrinenko/nix-bump-preview";
 ```
 
-Or download a binary from the
-[latest release](https://github.com/mlavrinenko/nix-bump-preview/releases/latest).
+Use `inputs.nix-bump-preview.packages.${pkgs.stdenv.hostPlatform.system}.default`
+in `home.packages` or `environment.systemPackages`. To try it without installing:
+
+```console
+$ nix run github:mlavrinenko/nix-bump-preview -- --input unstable --installable ...
+```
 
 ## Development
 
-Prerequisites: [Nix](https://nixos.org/) with flakes enabled.
-
-```bash
-direnv allow         # or: nix develop
-just install-hooks   # pre-commit hook running the (memoized) gate
-
-just check           # memoized gates: fmt, clippy, tests, unused deps, file size,
-                     # tasks (skipped without MindTape), drift, copy-paste
-just fix-check       # eject inline tests, clippy --fix, fmt, then the full check
-just deny            # cargo-deny: advisories, licenses, bans (needs network)
-just build
-just test
-just cover           # code coverage via cargo-llvm-cov (70% minimum)
-just crap            # CRAP gate over the coverage report (threshold 30)
-just fmt             # format code
-just schema          # regenerate schema/report.schema.json from the report types
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for coding conventions.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

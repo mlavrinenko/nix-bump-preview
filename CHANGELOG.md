@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The README is consumer-facing: the status section is gone, the delta limit
+  lives in How it works, and Install documents the flake input and `nix run`.
+- The product and process goals are tracked Typst modules under `truth/`, and
+  every open task rates them in `x-goals` instead of a prose Goals section.
+- The Justfile documents every recipe with `[doc("...")]`, holds no comments,
+  and keeps its longer bodies in `.just/scripts/`.
+- `Cargo.toml` carries crates.io keywords and a second category, so the crate
+  is discoverable.
+- The release workflow publishes through crates.io Trusted Publishing instead
+  of an expiring `CARGO_REGISTRY_TOKEN` secret.
+
+### Fixed
+
+- A green `just crap` prints nothing: the gate uses cargo-crap's `github`
+  format and keeps one line per failing function.
+
 ### Added
 
 - The MVP: preview a Nix flake input bump without building or switching,

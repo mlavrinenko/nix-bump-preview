@@ -1,0 +1,8 @@
+[package]
+name = "nix-bump-preview"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Lavrinenko Maxim"]
+license = "MIT"
+description = "Product and process goals for nix-bump-preview"
+repository = "https://github.com/mlavrinenko/nix-bump-preview"

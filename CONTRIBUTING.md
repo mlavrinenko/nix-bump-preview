@@ -24,6 +24,13 @@ Keep `main.rs` as a thin entry point — argument parsing, logger init, and a ca
 library code. All logic belongs in `lib.rs` (and its modules). `main.rs` is excluded from
 coverage, so anything there is untested by default.
 
+## Goals, Tasks, and Recipes
+
+The goals live in [truth/goals.typ](truth/goals.typ) and
+[truth/process-goals.typ](truth/process-goals.typ); every open task rates each
+in `x-goals`, managed with `mt`. Every public recipe carries `[doc("...")]` and
+a group, the Justfile holds no comments, and longer bodies live in `.just/scripts/`.
+
 ## Testing
 
 - Unit tests live inline in a `#[cfg(test)] mod tests` block next to the code they exercise.
@@ -52,12 +59,10 @@ coverage, so anything there is untested by default.
 ## Code Coverage
 
 Minimum 70% line coverage, enforced by `just cover` via `cargo-llvm-cov`. It
-merges the profraw of child processes, so subprocess-based e2e tests attribute
-correctly, unlike tarpaulin. It starts with `cargo llvm-cov clean --workspace`
-on purpose: `--no-report` keeps the profraw pile so runs can be merged, and
-without the clean a long-lived checkout scores binaries that no longer exist.
-Never trade it for speed.
-`main.rs` is excluded from coverage — keep it thin and move testable logic to `lib.rs`.
+merges child-process profraw, so subprocess e2e tests attribute correctly. The
+`cargo llvm-cov clean --workspace` is deliberate: `--no-report` keeps the pile,
+and without the clean a long-lived checkout scores deleted binaries. `main.rs`
+is excluded; keep it thin and move testable logic to `lib.rs`.
 
 ## CRAP Gate
 
@@ -67,16 +72,11 @@ coverage threshold can stay green while one branchy, untested function rots;
 CRAP catches that. Fix a flagged function by adding tests or reducing its
 branching. Tune the threshold per repo via `--threshold` or a `.cargo-crap.toml`.
 
-It reads `target/coverage/lcov.info` and **refuses a stale one** rather than
-scoring it, because cargo-crap's `--missing pessimistic` grades a function with
-no coverage record as 0% — so every file added since the last `just cover` reads
-as completely untested and arrives as a plausible finding. `just
-_lcov-stale-reason` is that test; run `just cover` first (CI and `just validate`
-chain them). The same rule is why `tests/**` and every ejected `*_tests.rs` are
-excluded: llvm-cov instruments the code under test, not the suite, so without
-those excludes the gate grades your test helpers. `--min 30`, matched to the
-threshold, is what keeps a green run quiet — the table then prints only what
-fails, and a red run still names every offender.
+It reads `target/coverage/lcov.info` and refuses a stale one, because cargo-crap
+scores a function with no record as 0% covered. Run `just cover` first;
+`.just/scripts/lcov-stale-reason.sh` is the check. The same rule excludes
+`tests/**` and ejected `*_tests.rs` files, which llvm-cov never instruments.
+`--format github` prints one line per failure and nothing on a green run.
 
 ## File Size Limits
 
@@ -120,9 +120,6 @@ worth knowing:
   delete its record under `.mmz/cache/` (gitignored via `.mmz/.gitignore`).
 - `just status` (`mmz --status`) prints every rule's freshness as a table — what
   a `just check` would re-run, and whether the pre-commit hook would pass now.
-- A brand-new clone has no `Cargo.lock`; cargo writes it during the first
-  `just check`, so the arms that declare it miss once more on the second run.
-  A no-op re-run is a full hit from the third on. That miss is not a broken cache.
 
 ## Copy-Paste Gate
 
@@ -158,7 +155,9 @@ under `[Unreleased]`. [cargo-release](https://github.com/crate-ci/cargo-release)
 `.just/scripts/release-hook.sh`, which holds every refusal, and commits. The
 recipe pushes `main`, waits for `ci.yml` on it (`.just/scripts/release-ci.sh`)
 and tags only if it is green. After a red run, fix `main` and re-run: the bump
-stays done. The tag push is the only publish path, so never `cargo publish` by
+stays done. The tag pushes through crates.io Trusted Publishing, so configure a
+Trusted Publisher (owner, repo, workflow `release.yml`, environment `crates-io`)
+before the first tag; no registry token secret exists. Never `cargo publish` by
 hand.
 
 ## MSRV

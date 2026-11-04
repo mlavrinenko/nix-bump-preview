@@ -19,6 +19,7 @@ require_tracked:
   - "src/**"
   - "crates/*/src/**"
   - "docs/**"
+  - "truth/**"
   - "www/**"
   - "README.md"
   - "CHANGELOG.md"
@@ -87,10 +88,14 @@ groups:
   - name: product-docs
     source:
       - "docs/**"
+      - "truth/**"
     dependents:
       - README.md
       - AGENTS.md
       - www/index.html
+      - ".mindtape/templates/task.typ"
+      - ".mindtape/config.toml"
+      - ".mmz/config.yaml"
 
   # A package change (version, dependencies, metadata) should land in the
   # changelog.
