@@ -1,11 +1,17 @@
+use std::fmt::Write as _;
+
 use schemars::JsonSchema;
 use serde::Serialize;
 
 /// Version of the JSON report shape.
 pub const SCHEMA_VERSION: u32 = 1;
 
+/// The approximation warning text shared by both output formats.
+pub const DELTA_WARNING: &str =
+    "the delta is the build-time derivation graph, not the runtime closure";
+
 /// A machine-readable preview report.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Report {
     /// Version of the report shape; currently 1.
@@ -25,7 +31,7 @@ pub struct Report {
 }
 
 /// One selected input and its resolved lock entries.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct InputReport {
     /// Input name.
@@ -39,7 +45,7 @@ pub struct InputReport {
 }
 
 /// Resolved fields of a lock entry; absent fields are omitted.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Locked {
     /// Resolved revision.
@@ -57,7 +63,7 @@ pub struct Locked {
 }
 
 /// One installable and its derivation preview.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct InstallableReport {
     /// Installable attr.
@@ -77,7 +83,7 @@ pub struct InstallableReport {
 }
 
 /// A derivation path evaluated against one lock.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Derivation {
     /// Store path of the `.drv` file.
@@ -85,7 +91,7 @@ pub struct Derivation {
 }
 
 /// Package version changes from the build-time derivation graph.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Delta {
     /// Name of the approximation used for the delta.
@@ -95,7 +101,7 @@ pub struct Delta {
 }
 
 /// One package whose version set changed.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Change {
     /// Package name.
@@ -121,7 +127,7 @@ pub enum ChangeKind {
 }
 
 /// What the proposed lock would build and fetch.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Cost {
     /// Derivations to build.
@@ -135,7 +141,7 @@ pub struct Cost {
 }
 
 /// Direct version report for one attr.
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct AttrReport {
     /// Attr whose `.version` was evaluated.
@@ -159,189 +165,168 @@ pub fn schema_json() -> serde_json::Result<String> {
     serde_json::to_string_pretty(&schema)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Render a report as one pretty-printed JSON object with a trailing newline.
+///
+/// # Errors
+///
+/// Returns an error if the report cannot be serialized.
+pub fn render_json(report: &Report) -> serde_json::Result<String> {
+    let mut json = serde_json::to_string_pretty(report)?;
+    json.push('\n');
+    Ok(json)
+}
 
-    const COMPLETE_REPORT_JSON: &str = r#"{
-  "schemaVersion": 1,
-  "flake": "/tmp/flake",
-  "inputs": [
-    {
-      "name": "unstable",
-      "changed": true,
-      "before": {
-        "rev": "fe132422",
-        "lastModified": 1792094642,
-        "narHash": "sha256-before"
-      },
-      "after": {
-        "rev": "3ec63636",
-        "lastModified": 1792773339,
-        "narHash": "sha256-after"
-      }
+/// Render a report as the human-readable text contract in `docs/report.md`.
+#[must_use]
+pub fn render_text(report: &Report) -> String {
+    let mut out = String::new();
+    render_inputs(&mut out, &report.inputs);
+    render_installables(&mut out, &report.installables);
+    for attr in &report.attrs {
+        let _ = writeln!(
+            out,
+            "  attr {}: {} -> {}",
+            attr.attr, attr.before, attr.after
+        );
     }
-  ],
-  "installables": [
-    {
-      "attr": "nixosConfigurations.example.config.system.build.toplevel",
-      "before": {
-        "drvPath": "/nix/store/old.drv"
-      },
-      "after": {
-        "drvPath": "/nix/store/new.drv"
-      },
-      "delta": {
-        "approximation": "build-graph",
-        "changes": [
-          {
-            "name": "zed-editor",
-            "kind": "changed",
-            "before": [
-              "1.24.2"
-            ],
-            "after": [
-              "1.25.2"
-            ]
-          }
-        ]
-      },
-      "cost": {
-        "toBuild": 721,
-        "toFetch": 671,
-        "downloadBytes": 3221225472,
-        "unpackedBytes": 9019431322
-      }
+    for warning in &report.warnings {
+        let _ = writeln!(out, "warning: {warning}");
     }
-  ],
-  "attrs": [
-    {
-      "attr": "nixosConfigurations.example._module.args.pkgs.unstable.zed-editor",
-      "before": "1.24.2",
-      "after": "1.25.2"
+    out
+}
+
+fn render_inputs(out: &mut String, inputs: &[InputReport]) {
+    for input in inputs {
+        if input.changed {
+            let _ = writeln!(out, "input {}", input.name);
+            let _ = writeln!(
+                out,
+                "  {} -> {}",
+                render_locked(&input.before),
+                render_locked(&input.after)
+            );
+        } else {
+            let _ = writeln!(out, "input {}: unchanged", input.name);
+        }
     }
-  ],
-  "warnings": [
-    "the delta is the build-time derivation graph, not the runtime closure"
-  ]
-}"#;
+}
 
-    #[test]
-    fn serializes_the_complete_report_in_struct_order() {
-        let report = Report {
-            schema_version: SCHEMA_VERSION,
-            flake: "/tmp/flake".to_owned(),
-            inputs: vec![InputReport {
-                name: "unstable".to_owned(),
-                changed: true,
-                before: Locked {
-                    rev: Some("fe132422".to_owned()),
-                    last_modified: Some(1_792_094_642),
-                    nar_hash: Some("sha256-before".to_owned()),
-                },
-                after: Locked {
-                    rev: Some("3ec63636".to_owned()),
-                    last_modified: Some(1_792_773_339),
-                    nar_hash: Some("sha256-after".to_owned()),
-                },
-            }],
-            installables: vec![InstallableReport {
-                attr: "nixosConfigurations.example.config.system.build.toplevel".to_owned(),
-                before: Derivation {
-                    drv_path: "/nix/store/old.drv".to_owned(),
-                },
-                after: Derivation {
-                    drv_path: "/nix/store/new.drv".to_owned(),
-                },
-                delta: Some(Delta {
-                    approximation: "build-graph".to_owned(),
-                    changes: vec![Change {
-                        name: "zed-editor".to_owned(),
-                        kind: ChangeKind::Changed,
-                        before: vec!["1.24.2".to_owned()],
-                        after: vec!["1.25.2".to_owned()],
-                    }],
-                }),
-                cost: Some(Cost {
-                    to_build: 721,
-                    to_fetch: 671,
-                    download_bytes: 3_221_225_472,
-                    unpacked_bytes: 9_019_431_322,
-                }),
-            }],
-            attrs: vec![AttrReport {
-                attr: "nixosConfigurations.example._module.args.pkgs.unstable.zed-editor"
-                    .to_owned(),
-                before: "1.24.2".to_owned(),
-                after: "1.25.2".to_owned(),
-            }],
-            warnings: vec![
-                "the delta is the build-time derivation graph, not the runtime closure".to_owned(),
-            ],
-        };
-
-        let json = serde_json::to_string_pretty(&report).expect("report should serialize");
-
-        assert_eq!(json, COMPLETE_REPORT_JSON);
+fn render_installables(out: &mut String, installables: &[InstallableReport]) {
+    for installable in installables {
+        let _ = writeln!(out, "installable {}", installable.attr);
+        render_delta(out, installable.delta.as_ref());
+        render_cost(out, installable.cost.as_ref());
     }
+}
 
-    #[test]
-    fn omits_optional_and_empty_fields() {
-        let report = Report {
-            schema_version: SCHEMA_VERSION,
-            flake: "/tmp/flake".to_owned(),
-            inputs: vec![InputReport {
-                name: "path".to_owned(),
-                changed: false,
-                before: Locked {
-                    rev: None,
-                    last_modified: None,
-                    nar_hash: None,
-                },
-                after: Locked {
-                    rev: None,
-                    last_modified: Some(1_792_094_642),
-                    nar_hash: None,
-                },
-            }],
-            installables: vec![InstallableReport {
-                attr: "example".to_owned(),
-                before: Derivation {
-                    drv_path: "/nix/store/old.drv".to_owned(),
-                },
-                after: Derivation {
-                    drv_path: "/nix/store/new.drv".to_owned(),
-                },
-                delta: None,
-                cost: None,
-            }],
-            attrs: Vec::new(),
-            warnings: Vec::new(),
-        };
-
-        let value = serde_json::to_value(&report).expect("report should serialize");
-
-        assert_eq!(
-            value,
-            serde_json::json!({
-                "schemaVersion": 1,
-                "flake": "/tmp/flake",
-                "inputs": [
-                    {
-                        "name": "path",
-                        "changed": false,
-                        "before": {},
-                        "after": { "lastModified": 1_792_094_642 }
-                    }
-                ],
-                "installables": [
-                    {
-                        "attr": "example",
-                        "before": { "drvPath": "/nix/store/old.drv" },
-                        "after": { "drvPath": "/nix/store/new.drv" }
-                    }
-                ]
-            })
+fn render_delta(out: &mut String, delta: Option<&Delta>) {
+    let Some(delta) = delta else {
+        return;
+    };
+    let _ = writeln!(
+        out,
+        "  delta (build graph): {} changes",
+        delta.changes.len()
+    );
+    for change in &delta.changes {
+        let _ = writeln!(
+            out,
+            "    {} {} -> {}",
+            change.name,
+            render_versions(&change.before),
+            render_versions(&change.after)
         );
     }
 }
+
+fn render_versions(versions: &[String]) -> String {
+    if versions.is_empty() {
+        "∅".to_owned()
+    } else {
+        versions.join(", ")
+    }
+}
+
+fn render_cost(out: &mut String, cost: Option<&Cost>) {
+    let Some(cost) = cost else {
+        return;
+    };
+    let _ = writeln!(
+        out,
+        "  cost: {} to build, {} to fetch ({} download, {} unpacked)",
+        cost.to_build,
+        cost.to_fetch,
+        format_size(cost.download_bytes),
+        format_size(cost.unpacked_bytes)
+    );
+}
+
+fn render_locked(locked: &Locked) -> String {
+    let revision = locked
+        .rev
+        .as_deref()
+        .or(locked.nar_hash.as_deref())
+        .map_or_else(|| "?".to_owned(), first_eight);
+    match locked.last_modified {
+        Some(timestamp) => format!("{revision} ({})", format_date(timestamp)),
+        None => revision,
+    }
+}
+
+fn first_eight(text: &str) -> String {
+    text.chars().take(8).collect()
+}
+
+fn format_date(timestamp: u64) -> String {
+    let seconds = i64::try_from(timestamp).unwrap_or(i64::MAX);
+    let (year, month, day) = civil_from_days(seconds.div_euclid(86_400));
+    format!("{year:04}-{month:02}-{day:02}")
+}
+
+fn civil_from_days(days: i64) -> (i64, u32, u32) {
+    let shifted = days + 719_468;
+    let era = if shifted >= 0 {
+        shifted
+    } else {
+        shifted - 146_096
+    } / 146_097;
+    let day_of_era = shifted - era * 146_097;
+    let year_of_era =
+        (day_of_era - day_of_era / 1_460 + day_of_era / 36_524 - day_of_era / 146_096) / 365;
+    let year = year_of_era + era * 400;
+    let day_of_year = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
+    let month_position = (5 * day_of_year + 2) / 153;
+    let day = day_of_year - (153 * month_position + 2) / 5 + 1;
+    let month = if month_position < 10 {
+        month_position + 3
+    } else {
+        month_position - 9
+    };
+    let leap_adjust = i64::from(month <= 2);
+    (
+        year + leap_adjust,
+        u32::try_from(month).unwrap_or(1),
+        u32::try_from(day).unwrap_or(1),
+    )
+}
+
+fn format_size(bytes: u64) -> String {
+    const UNITS: [(&str, u64); 5] = [
+        ("TiB", 1_u64 << 40),
+        ("GiB", 1_u64 << 30),
+        ("MiB", 1_u64 << 20),
+        ("KiB", 1_u64 << 10),
+        ("B", 1),
+    ];
+    let (unit, factor) = UNITS
+        .iter()
+        .find(|(_, factor)| bytes >= *factor)
+        .copied()
+        .unwrap_or(("B", 1));
+    let tenths = (u128::from(bytes) * 10 + u128::from(factor) / 2) / u128::from(factor);
+    format!("{}.{} {unit}", tenths / 10, tenths % 10)
+}
+
+#[cfg(test)]
+#[path = "report_tests.rs"]
+mod tests;

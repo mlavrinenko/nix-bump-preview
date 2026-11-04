@@ -4,10 +4,10 @@ groups:
   cli-docs:
     source:
       src/cli.rs: e5b807e89d1930bc8b4954e55765980e55a2809a5a0899f556eafa9ac4267144
-      src/lib.rs: 480795e083b228c013e2464a35179225d95548174727ddb65ee687928c17b072
-      src/main.rs: 7c64b7f1829dce31910b8970694cac08fa91ae403e39a4d02be2c59674925f8b
+      src/lib.rs: 1dd9a818a29da4405fdffbe49bc4a9972b6855d7c440c2fcd928f03b8c134bfd
+      src/main.rs: ea53d3b088c4ebe740e1dc0af458bba0e639240047dd8423c6bdd0ce19662d4d
     dependents:
-      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
+      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   cost-pipeline:
     source:
@@ -15,14 +15,14 @@ groups:
       src/cost_tests.rs: e7c5ae7ffd01ae72665e8d4238e8001c68ff806a35664b882bd6e8601789e21c
     dependents:
       docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
-      docs/report.md: 12dd1fcfacec23346fce045426743b06edcaef4588e904c03bf66d4374a7a204
+      docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
   delta-pipeline:
     source:
       src/delta.rs: 69fe19378262c4bfbfb0ad6aa4da28005797b0366949b667cc9ca5cc8b9677b9
       src/delta_tests.rs: e7cc40fa322332c21573e8d7be5cb4f68ddde051d9b4385a9fe5283b2627cc9b
     dependents:
       docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
-      docs/report.md: 12dd1fcfacec23346fce045426743b06edcaef4588e904c03bf66d4374a7a204
+      docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
   dev-docs:
     source:
       .config/nextest.toml: ec97d2444d9bf38aae8499d53eac3ffbbab47593637e3a324452ee72bec0ef0b
@@ -53,20 +53,22 @@ groups:
     source:
       docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
       docs/goals.md: 764a255aa814caeba25f18e16b3d2184b9bee1dbb0da43fe0b639dbf2ba4c84e
-      docs/report.md: 12dd1fcfacec23346fce045426743b06edcaef4588e904c03bf66d4374a7a204
+      docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
     dependents:
       AGENTS.md: cbc27f76d63c94ca823da4eff43e4c06470be9b5c53a38229f372394d3a2b674
-      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
+      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   release-notes:
     source:
-      Cargo.toml: 6a7ac401aa23dd5650885c525ce8cb4cb6a3789f311574766bfd4c57663fd8ee
+      Cargo.toml: d97840c128447f64cc77df3358961613d3d69cb32413a8d0b97507e34dabd847
     dependents:
-      CHANGELOG.md: 6478d5f1cc32d52598dd9c33d6e3e2b6dc452af1beffe56c88ceccc4c05c8d5e
+      CHANGELOG.md: d0951962fc666c382df4fa0e17d7839067471fdd5b59e2283f4f28f010a564dc
   report-contract:
     source:
-      src/report.rs: bc43ad4f32298532041c7077cce7d582f72f9a8f074bda3e22fd1ada027cfb63
+      src/report.rs: d393c6991db6b51e9162143e77d04a91c6cd10d2473895d6cc26f991c496fcb5
+      src/report_tests.rs: 495adce9a60fe2fdbdfd3282e66218fd6ff73a2dfe041b1f0233803869927432
     dependents:
-      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
-      docs/report.md: 12dd1fcfacec23346fce045426743b06edcaef4588e904c03bf66d4374a7a204
+      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
+      docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
       schema/report.schema.json: 374a85937ab1a9db2b9ec6567d71886251aed2e0b17d53c1466951576df1660a
+      tests/fixtures/reports/example.json: 4399e47dc06fc3aa4a9f2822b132aba08c41b86ba1c49f1dfc15e8ae85dcc68d

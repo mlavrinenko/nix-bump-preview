@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "flake": "/tmp/example",
+  "inputs": [
+    {
+      "name": "local",
+      "changed": false,
+      "before": {
+        "narHash": "sha256-local"
+      },
+      "after": {
+        "narHash": "sha256-local"
+      }
+    },
+    {
+      "name": "nixpkgs",
+      "changed": true,
+      "before": {
+        "rev": "fe132422aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "lastModified": 1792094642,
+        "narHash": "sha256-before"
+      },
+      "after": {
+        "rev": "3ec63636bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "lastModified": 1792773339,
+        "narHash": "sha256-after"
+      }
+    },
+    {
+      "name": "stable",
+      "changed": true,
+      "before": {
+        "rev": "9999999999999999999999999999999999999999",
+        "lastModified": 1792000000,
+        "narHash": "sha256-stable"
+      },
+      "after": {
+        "rev": "9999999999999999999999999999999999999999",
+        "lastModified": 1792000000,
+        "narHash": "sha256-stable"
+      }
+    },
+    {
+      "name": "unstable",
+      "changed": false,
+      "before": {
+        "rev": "8888888888888888888888888888888888888888",
+        "lastModified": 1792094642,
+        "narHash": "sha256-unstable"
+      },
+      "after": {
+        "rev": "8888888888888888888888888888888888888888",
+        "lastModified": 1792094642,
+        "narHash": "sha256-unstable"
+      }
+    }
+  ],
+  "installables": [
+    {
+      "attr": "nixosConfigurations.example.config.system.build.toplevel",
+      "before": {
+        "drvPath": "/nix/store/before.drv"
+      },
+      "after": {
+        "drvPath": "/nix/store/after.drv"
+      },
+      "delta": {
+        "approximation": "build-graph",
+        "changes": [
+          {
+            "name": "libfoo",
+            "kind": "changed",
+            "before": [
+              "1.0"
+            ],
+            "after": [
+              "1.1"
+            ]
+          },
+          {
+            "name": "newpkg",
+            "kind": "added",
+            "before": [],
+            "after": [
+              "2.0"
+            ]
+          },
+          {
+            "name": "oldpkg",
+            "kind": "removed",
+            "before": [
+              "1.0"
+            ],
+            "after": []
+          }
+        ]
+      },
+      "cost": {
+        "toBuild": 721,
+        "toFetch": 671,
+        "downloadBytes": 3221225472,
+        "unpackedBytes": 9019431322
+      }
+    }
+  ],
+  "attrs": [
+    {
+      "attr": "nixosConfigurations.example._module.args.pkgs.unstable.zed-editor",
+      "before": "1.24.2",
+      "after": "1.25.2"
+    }
+  ],
+  "warnings": [
+    "the delta is the build-time derivation graph, not the runtime closure",
+    "ignored malformed diff line: not a line"
+  ]
+}

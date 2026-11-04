@@ -131,9 +131,11 @@ fn keep_lock_rejects_lock_file() {
 }
 
 #[test]
-fn valid_invocation_reports_the_missing_pipeline() {
+fn a_missing_flake_fails_before_rendering() {
     binary()
         .args([
+            "--flake",
+            "/nonexistent/nix-bump-preview-flake",
             "--lock-file",
             "proposed.lock",
             "--installable",
@@ -142,9 +144,7 @@ fn valid_invocation_reports_the_missing_pipeline() {
         .assert()
         .code(2)
         .stdout(predicate::str::is_empty())
-        .stderr(predicate::str::contains(
-            "error: preview pipeline is not implemented yet",
-        ));
+        .stderr(predicate::str::contains("flake directory does not exist"));
 }
 
 #[test]

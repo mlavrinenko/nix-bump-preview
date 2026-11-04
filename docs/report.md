@@ -107,15 +107,17 @@ installable nixosConfigurations.example.config.system.build.toplevel
     newpkg ∅ -> 2.0
     oldpkg 1.0 -> ∅
     zed-editor 1.24.2 -> 1.25.2
-  attr nixosConfigurations.example._module.args.pkgs.unstable.zed-editor: 1.24.2 -> 1.25.2
   cost: 721 to build, 671 to fetch (3.0 GiB download, 8.4 GiB unpacked)
+  attr nixosConfigurations.example._module.args.pkgs.unstable.zed-editor: 1.24.2 -> 1.25.2
 warning: the delta is the build-time derivation graph, not the runtime closure
 ```
 
-Revisions are truncated to eight characters. Dates are UTC `YYYY-MM-DD` from
-`lastModified`; when it is absent, print the revision only. Multiple versions
-are comma-separated. Text prints every parsed change. `--format json` is the
-scripting surface.
+Revisions are truncated to eight characters. When an input has no `rev`, print
+the first eight characters of `narHash`, or `?` when both are absent. Dates are
+UTC `YYYY-MM-DD` from `lastModified`; when the date is absent, print the
+revision only. Multiple versions are comma-separated. Text prints every parsed
+change. Attrs render once, after every installable block. `--format json` is
+the scripting surface.
 
 ## Exit codes
 

@@ -8,7 +8,8 @@ fn main() -> ExitCode {
 
     let cli = Cli::parse();
     match nix_bump_preview::run(&cli) {
-        Ok(()) => ExitCode::SUCCESS,
+        Ok(0) => ExitCode::SUCCESS,
+        Ok(_) => ExitCode::from(1),
         Err(error) => {
             eprintln!("error: {error:#}");
             ExitCode::from(2)

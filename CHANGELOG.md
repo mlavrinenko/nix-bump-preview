@@ -27,3 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The build and fetch cost parser for `nix build --dry-run`, reading both plan
   headers, summing repeated headers, accepting singular and plural counts, and
   converting binary-unit sizes with exact half-up rounding.
+- The end-to-end preview pipeline and both report formats, with the same facts
+  in text and JSON. `--no-delta` and `--no-cost` skip their Nix calls, the delta
+  approximation is stated as a warning, and `--exit-code` reports changes and
+  build cost.

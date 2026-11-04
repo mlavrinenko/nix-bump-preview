@@ -177,6 +177,14 @@ impl Harness {
         &self.flake
     }
 
+    pub fn scenario(&self) -> &Path {
+        &self.scenario
+    }
+
+    pub fn log_path(&self) -> &Path {
+        &self.log
+    }
+
     pub fn respond(&self, index: u32, response: &Response) {
         self.respond_with("flake-update", index, response);
     }

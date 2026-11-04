@@ -44,13 +44,12 @@ The project is scaffolded. The MVP work is tracked in
 ## JSON
 
 `--format json` is the scripting surface. It is schema-backed at
-[`schema/report.schema.json`](schema/report.schema.json).
+[`schema/report.schema.json`](schema/report.schema.json). The committed
+[example report](tests/fixtures/reports/example.json) shows the shape:
 
 ```bash
-nix-bump-preview --input unstable \
-  --installable nixosConfigurations.example.config.system.build.toplevel \
-  --format json |
-  jq '.installables[] | {attr, changes: .delta.changes, cost}'
+jq '.installables[] | {attr, changes: .delta.changes, cost}' \
+  tests/fixtures/reports/example.json
 ```
 
 ## Limits
