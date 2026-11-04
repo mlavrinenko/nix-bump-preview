@@ -36,9 +36,20 @@ groups:
     source:
       - "{src,crates/*/src}/lib.rs"
       - "{src,crates/*/src}/main.rs"
+      - "{src,crates/*/src}/cli.rs"
     dependents:
       - README.md
       - www/index.html
+
+  # The report types produce the committed JSON schema, and the report contract
+  # and README describe the same object. A type change flags each dependent.
+  - name: report-contract
+    source:
+      - "{src,crates/*/src}/report.rs"
+    dependents:
+      - schema/report.schema.json
+      - docs/report.md
+      - README.md
 
   # The goal and design documents are the source of truth for the README and
   # the agent rules. A goal or contract change flags both for a look.

@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Report",
+  "description": "A machine-readable preview report.",
+  "type": "object",
+  "properties": {
+    "attrs": {
+      "description": "Attrs in CLI order; omitted when empty.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AttrReport"
+      }
+    },
+    "flake": {
+      "description": "Canonical path to the flake directory.",
+      "type": "string"
+    },
+    "inputs": {
+      "description": "Selected inputs, sorted by name.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InputReport"
+      }
+    },
+    "installables": {
+      "description": "Installables in CLI order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InstallableReport"
+      }
+    },
+    "schemaVersion": {
+      "description": "Version of the report shape; currently 1.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "warnings": {
+      "description": "Non-fatal problems; omitted when empty.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "flake",
+    "inputs",
+    "installables"
+  ],
+  "$defs": {
+    "AttrReport": {
+      "description": "Direct version report for one attr.",
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "Version under the after lock.",
+          "type": "string"
+        },
+        "attr": {
+          "description": "Attr whose `.version` was evaluated.",
+          "type": "string"
+        },
+        "before": {
+          "description": "Version under the before lock.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attr",
+        "before",
+        "after"
+      ]
+    },
+    "Change": {
+      "description": "One package whose version set changed.",
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "Versions in the after lock.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "before": {
+          "description": "Versions in the before lock.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "description": "What happened to the package.",
+          "$ref": "#/$defs/ChangeKind"
+        },
+        "name": {
+          "description": "Package name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "before",
+        "after"
+      ]
+    },
+    "ChangeKind": {
+      "description": "Classification of a package change.",
+      "oneOf": [
+        {
+          "description": "The package appeared in the after graph.",
+          "type": "string",
+          "const": "added"
+        },
+        {
+          "description": "The package disappeared from the after graph.",
+          "type": "string",
+          "const": "removed"
+        },
+        {
+          "description": "The package stayed but its versions differ.",
+          "type": "string",
+          "const": "changed"
+        }
+      ]
+    },
+    "Cost": {
+      "description": "What the proposed lock would build and fetch.",
+      "type": "object",
+      "properties": {
+        "downloadBytes": {
+          "description": "Download size in bytes.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "toBuild": {
+          "description": "Derivations to build.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "toFetch": {
+          "description": "Paths to fetch.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "unpackedBytes": {
+          "description": "Unpacked size in bytes.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "toBuild",
+        "toFetch",
+        "downloadBytes",
+        "unpackedBytes"
+      ]
+    },
+    "Delta": {
+      "description": "Package version changes from the build-time derivation graph.",
+      "type": "object",
+      "properties": {
+        "approximation": {
+          "description": "Name of the approximation used for the delta.",
+          "type": "string"
+        },
+        "changes": {
+          "description": "Changed packages, sorted by name.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Change"
+          }
+        }
+      },
+      "required": [
+        "approximation",
+        "changes"
+      ]
+    },
+    "Derivation": {
+      "description": "A derivation path evaluated against one lock.",
+      "type": "object",
+      "properties": {
+        "drvPath": {
+          "description": "Store path of the `.drv` file.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "drvPath"
+      ]
+    },
+    "InputReport": {
+      "description": "One selected input and its resolved lock entries.",
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "Entry in the after lock.",
+          "$ref": "#/$defs/Locked"
+        },
+        "before": {
+          "description": "Entry in the before lock.",
+          "$ref": "#/$defs/Locked"
+        },
+        "changed": {
+          "description": "Whether any resolved field differs between the two locks.",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Input name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "changed",
+        "before",
+        "after"
+      ]
+    },
+    "InstallableReport": {
+      "description": "One installable and its derivation preview.",
+      "type": "object",
+      "properties": {
+        "after": {
+          "description": "Derivation evaluated against the after lock.",
+          "$ref": "#/$defs/Derivation"
+        },
+        "attr": {
+          "description": "Installable attr.",
+          "type": "string"
+        },
+        "before": {
+          "description": "Derivation evaluated against the before lock.",
+          "$ref": "#/$defs/Derivation"
+        },
+        "cost": {
+          "description": "Build and fetch cost; omitted when not computed.",
+          "$ref": "#/$defs/Cost"
+        },
+        "delta": {
+          "description": "Package delta; omitted when not computed.",
+          "$ref": "#/$defs/Delta"
+        }
+      },
+      "required": [
+        "attr",
+        "before",
+        "after"
+      ]
+    },
+    "Locked": {
+      "description": "Resolved fields of a lock entry; absent fields are omitted.",
+      "type": "object",
+      "properties": {
+        "lastModified": {
+          "description": "Resolution timestamp as a Unix timestamp.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "narHash": {
+          "description": "NAR hash of the resolved source.",
+          "type": "string"
+        },
+        "rev": {
+          "description": "Resolved revision.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

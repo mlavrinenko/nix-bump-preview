@@ -1,20 +1,17 @@
-use anyhow::Result;
+use std::process::ExitCode;
+
 use clap::Parser;
+use nix_bump_preview::cli::Cli;
 
-/// Preview a Nix flake input bump: package version deltas and build cost, without building or switching
-#[derive(Parser)]
-#[command(version, about)]
-struct Cli {
-    /// Name to greet
-    #[arg(default_value = "nix-bump-preview")]
-    name: String,
-}
-
-fn main() -> Result<()> {
+fn main() -> ExitCode {
     env_logger::init();
 
     let cli = Cli::parse();
-    nix_bump_preview::greet(&cli.name)?;
-
-    Ok(())
+    match nix_bump_preview::run(&cli) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("error: {error:#}");
+            ExitCode::from(2)
+        }
+    }
 }

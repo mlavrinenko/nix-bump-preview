@@ -83,6 +83,7 @@ just build
 just test
 just cover           # code coverage via cargo-llvm-cov (70% minimum)
 just fmt             # format code
+just schema          # regenerate schema/report.schema.json from the report types
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for coding conventions.

@@ -102,6 +102,17 @@ clippy-fix:
 build *args:
     cargo build --workspace -q {{ args }}
 
+# Regenerate the committed JSON schema through the binary, so `src/report.rs`
+# and `schema/report.schema.json` cannot drift. The schema test in
+# `tests/it/cli.rs` compares the two and says to run this when they differ.
+schema:
+    #!/usr/bin/env bash
+    set -eo pipefail
+    out=$(mktemp)
+    trap 'rm -f "$out"' EXIT
+    cargo run --quiet -- --print-schema > "$out"
+    mv "$out" schema/report.schema.json
+
 # Paths kept out of the coverage report, shared by both report passes below.
 # main.rs is excluded — keep it thin; `just crap` excludes it too. The
 # /registry/src/ ignore keeps local and CI reporting the same set when

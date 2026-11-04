@@ -3,10 +3,11 @@ algorithm: blake3
 groups:
   cli-docs:
     source:
-      src/lib.rs: b094bc298a082dd49edd9b158ca69e6eec21bc4bc51efd1f1d48ca97527c270f
-      src/main.rs: 88851485a3a4e2449f8ae397c23b1fa06d4efc22af74f23f9d327c197dd2eaac
+      src/cli.rs: e5b807e89d1930bc8b4954e55765980e55a2809a5a0899f556eafa9ac4267144
+      src/lib.rs: 61bf039df08cc06779fea70311b09bdc851b68117b9fcb249bfda2f8d6b4189d
+      src/main.rs: 7c64b7f1829dce31910b8970694cac08fa91ae403e39a4d02be2c59674925f8b
     dependents:
-      README.md: 910ad98e5ea0f4595e02aeb9baf1258ff6f853916f23b239526bbc616171ca1c
+      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   dev-docs:
     source:
@@ -19,8 +20,8 @@ groups:
       .just/scripts/wt-carry-lcov.sh: 8029a70af112114038526ec8d9024911b3a02f86c4c50c78cf7174d092852d1b
       .just/scripts/wt-lock.sh: bffd3f7179331f0216babfb9361b8b5e278eedb0f367a7ba163aec5c0e913b52
       .just/scripts/wt-tasks.sh: 976cf0f488e5f96f9cb906e2a83d696d0b0107f2b74edc90fcb301c165df3d14
-      .mmz/config.yaml: 80c0e80f50b3e9a2718181ca42b89a7b549e9335a379f5c1b2e60777492b6b7b
-      Justfile: 48d1dad72efa4d5ba309a5cc889cac31ac38b4cad6851132585706de9acb31d6
+      .mmz/config.yaml: 1430e999b5d8ecaeda3bfd8af7db9fd1e6836a01e3cf2398366ff71b6b3469f1
+      Justfile: 35eac924ed0ddae76896674ea72dee4620980f2649790da877c7e69ff0f4aea4
       flake.nix: abf19e16ee253fbee69f5dc07cd8e29354b870a4cc73428ba37cb5b8b88b4af3
       release.toml: 3474c8b3a3834220a00e31b084e769d8ca3cb60095280f6b6e70619723b5e021
     dependents:
@@ -33,10 +34,17 @@ groups:
       docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
     dependents:
       AGENTS.md: cbc27f76d63c94ca823da4eff43e4c06470be9b5c53a38229f372394d3a2b674
-      README.md: 910ad98e5ea0f4595e02aeb9baf1258ff6f853916f23b239526bbc616171ca1c
+      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   release-notes:
     source:
-      Cargo.toml: 1d1d485ddaa5c5b616db5d4f43522aea7a8f0e40f92689465163364370ad8857
+      Cargo.toml: 512ba7444419f2880bf44b2125c341b21f1a605d88d3ba5033f9fafc69696f1a
     dependents:
-      CHANGELOG.md: 3f543159c62cbbb2b2cad369cf88b55e54fe223c38fe985385bd731d0783480c
+      CHANGELOG.md: 388dc2a7f4990c0a319053d475e09436bcba79cf1d112d9f0ae0a9ed6a33e120
+  report-contract:
+    source:
+      src/report.rs: bc43ad4f32298532041c7077cce7d582f72f9a8f074bda3e22fd1ada027cfb63
+    dependents:
+      README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
+      docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
+      schema/report.schema.json: 374a85937ab1a9db2b9ec6567d71886251aed2e0b17d53c1466951576df1660a

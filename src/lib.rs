@@ -1,32 +1,26 @@
-use thiserror::Error;
+//! Preview a Nix flake input bump without building or switching.
 
-/// Errors that can occur in this library.
-#[derive(Debug, Error)]
-pub enum AppError {
-    /// An I/O operation failed.
-    #[error("i/o error: {0}")]
-    Io(#[from] std::io::Error),
-}
+pub mod cli;
+pub mod report;
 
-/// Greets the given name.
+use cli::Cli;
+
+/// Run the preview for `cli`.
 ///
 /// # Errors
 ///
-/// Returns [`AppError::Io`] if writing to stdout fails.
-pub fn greet(name: &str) -> Result<(), AppError> {
-    use std::io::Write;
-    log::info!("greeting {name}");
-    writeln!(std::io::stdout(), "Hello from {name}!")?;
-    Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_greet() {
-        // greet writes to stdout; just ensure it doesn't error
-        greet("test").expect("greet should succeed");
+/// Returns an error when the arguments are invalid, when the schema cannot be
+/// rendered, or while the preview pipeline is not implemented.
+pub fn run(cli: &Cli) -> anyhow::Result<()> {
+    if cli.print_schema {
+        println!("{}", report::schema_json()?);
+        return Ok(());
     }
+
+    cli.validate()?;
+    log::debug!(
+        "preview requested for {} installable(s)",
+        cli.installable.len()
+    );
+    anyhow::bail!("preview pipeline is not implemented yet")
 }

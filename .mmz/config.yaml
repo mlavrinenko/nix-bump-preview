@@ -42,6 +42,12 @@ scopes:
   rust-fmt:
     - "rustfmt.toml"
 
+  # The committed JSON schema is a test fixture: the drift test compares the
+  # binary's output to it, and outdatty tracks it as a dependent. A schema-only
+  # edit must re-run both gates that read it.
+  schema:
+    - "schema/**"
+
   # cargo clippy's config — edits change the lint surface.
   rust-clippy:
     - "clippy.toml"
@@ -145,7 +151,7 @@ commands:
   - name: just test
     match: exact
     tags: [gate]
-    inputs: [rust, gates-meta]
+    inputs: [rust, schema, gates-meta]
 
   - name: just machete
     tags: [gate]
@@ -171,7 +177,7 @@ commands:
   # lock; `outdatty-config` covers the lock and the group definitions directly.
   - name: just outdatty-check
     tags: [gate]
-    inputs: [outdatty-config, rust, docs, tooling-meta, gates-meta]
+    inputs: [outdatty-config, rust, schema, docs, tooling-meta, gates-meta]
 
   # Untagged from here down: these run outside `just check` (CI runs them in
   # their own job), so they stay out of the gate set. Memoized only so a no-op

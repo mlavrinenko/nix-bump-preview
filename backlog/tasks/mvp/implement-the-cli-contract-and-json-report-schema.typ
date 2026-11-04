@@ -8,7 +8,7 @@
   kind: "feat",
   assignee: "agent",
   estimate: (src-files: 4),
-  status: proposed(2026, 11, 4),
+  status: done(2026, 11, 4),
   links: parent("ship-the-nix-bump-preview-mvp.typ"),
 )
 

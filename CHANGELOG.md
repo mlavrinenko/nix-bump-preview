@@ -11,3 +11,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Project scaffold from cratemplate, product and process goals, the CLI and
   JSON design contract, and the MVP backlog.
+- The full CLI surface with the documented usage validation, and the frozen
+  JSON report types, committed schema, and `just schema` regeneration recipe.

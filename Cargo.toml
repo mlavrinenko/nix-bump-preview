@@ -11,7 +11,7 @@ license = "MIT"
 repository = "https://github.com/mlavrinenko/nix-bump-preview"
 keywords = []
 categories = ["command-line-utilities"]
-include = ["/src/", "/LICENSE*", "/README.md", "/CHANGELOG.md"]
+include = ["/src/", "/schema/", "/LICENSE*", "/README.md", "/CHANGELOG.md"]
 
 [lib]
 name = "nix_bump_preview"
@@ -26,8 +26,11 @@ thiserror = "2"
 log = "0.4"
 
 anyhow = "1"
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
 env_logger = "0.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+schemars = "1"
 
 [dev-dependencies]
 assert_cmd = "2"
