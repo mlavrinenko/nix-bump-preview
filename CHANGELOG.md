@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The MVP: preview a Nix flake input bump without building or switching,
+  reporting package version deltas and build and fetch cost in text or JSON.
 - Project scaffold from cratemplate, product and process goals, the CLI and
   JSON design contract, and the MVP backlog.
 - The full CLI surface with the documented usage validation, and the frozen

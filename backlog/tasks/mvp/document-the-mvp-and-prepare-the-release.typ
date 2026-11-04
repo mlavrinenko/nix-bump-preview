@@ -8,7 +8,7 @@
   kind: "docs",
   assignee: "agent",
   estimate: (src-files: 1),
-  status: proposed(2026, 11, 4),
+  status: wip(2026, 11, 4),
   links: parent("ship-the-nix-bump-preview-mvp.typ")
     + depends-on("add-end-to-end-tests-with-a-fake-nix.typ"),
 )

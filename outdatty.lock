@@ -7,7 +7,7 @@ groups:
       src/lib.rs: 1dd9a818a29da4405fdffbe49bc4a9972b6855d7c440c2fcd928f03b8c134bfd
       src/main.rs: ea53d3b088c4ebe740e1dc0af458bba0e639240047dd8423c6bdd0ce19662d4d
     dependents:
-      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
+      README.md: e494fbf2416f835d07febe2e5788bf57f265eaab3a202919d07fa6f9753ed35f
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   cost-pipeline:
     source:
@@ -56,19 +56,19 @@ groups:
       docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
     dependents:
       AGENTS.md: cbc27f76d63c94ca823da4eff43e4c06470be9b5c53a38229f372394d3a2b674
-      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
+      README.md: e494fbf2416f835d07febe2e5788bf57f265eaab3a202919d07fa6f9753ed35f
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   release-notes:
     source:
       Cargo.toml: d97840c128447f64cc77df3358961613d3d69cb32413a8d0b97507e34dabd847
     dependents:
-      CHANGELOG.md: d0951962fc666c382df4fa0e17d7839067471fdd5b59e2283f4f28f010a564dc
+      CHANGELOG.md: fb278f55cb2d17e241d3e2013f5bc663a7c0efa5a8a4bcaa0f8ea132d9700572
   report-contract:
     source:
       src/report.rs: d393c6991db6b51e9162143e77d04a91c6cd10d2473895d6cc26f991c496fcb5
       src/report_tests.rs: 495adce9a60fe2fdbdfd3282e66218fd6ff73a2dfe041b1f0233803869927432
     dependents:
-      README.md: 997300ec2c9868b32b9fddd4ef6ba38f0daaef32c1ee3463cb404f59461b4382
+      README.md: e494fbf2416f835d07febe2e5788bf57f265eaab3a202919d07fa6f9753ed35f
       docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
       schema/report.schema.json: 374a85937ab1a9db2b9ec6567d71886251aed2e0b17d53c1466951576df1660a
       tests/fixtures/reports/example.json: 4399e47dc06fc3aa4a9f2822b132aba08c41b86ba1c49f1dfc15e8ae85dcc68d

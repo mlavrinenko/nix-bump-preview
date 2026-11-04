@@ -24,8 +24,7 @@ require_tracked:
   - "CHANGELOG.md"
   - "CONTRIBUTING.md"
   - "AGENTS.md"
-  - "Cargo.toml"
-  - "crates/*/Cargo.toml"
+  - "{Cargo.toml,crates/*/Cargo.toml}"
   - "Justfile"
   - "flake.nix"
 groups:
@@ -97,8 +96,7 @@ groups:
   # changelog.
   - name: release-notes
     source:
-      - Cargo.toml
-      - "crates/*/Cargo.toml"
+      - "{Cargo.toml,crates/*/Cargo.toml}"
     dependents:
       - CHANGELOG.md
 
