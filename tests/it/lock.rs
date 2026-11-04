@@ -196,14 +196,93 @@ fn unknown_input_is_rejected_before_nix_runs() {
 }
 
 #[test]
-fn follows_root_input_is_a_clear_error() {
-    let mut harness = Harness::new("follows", "locks/follows.lock");
+fn input_selection_skips_unselected_follows_roots() {
+    let mut harness = Harness::new("follows-unselected", "locks/follows-before.lock");
+    harness.cli.input = vec!["normal".to_owned()];
+    harness.respond(1, &Response::success(&fixture("locks/follows-after.lock")));
+
+    let resolution = harness
+        .resolve()
+        .expect("an unselected follows root must not be resolved");
+
+    assert_eq!(input_names(&resolution), ["normal"]);
+    let normal = resolution.inputs().first().expect("normal input");
+    assert!(normal.changed);
+}
+
+#[test]
+fn all_selection_resolves_follows_roots() {
+    let mut harness = Harness::new("follows-all", "locks/follows-before.lock");
+    harness.cli.all = true;
+    harness.respond(1, &Response::success(&fixture("locks/follows-after.lock")));
+
+    let resolution = harness
+        .resolve()
+        .expect("a follows root should resolve to its target");
+    let alias = resolution
+        .inputs()
+        .iter()
+        .find(|input| input.name == "alias")
+        .expect("alias input should be reported");
+    let normal = resolution
+        .inputs()
+        .iter()
+        .find(|input| input.name == "normal")
+        .expect("normal input should be reported");
+
+    assert_eq!(input_names(&resolution), ["alias", "normal"]);
+    assert_eq!(alias.before.rev, normal.before.rev);
+    assert_eq!(alias.after.rev, normal.after.rev);
+    assert_eq!(
+        alias.before.rev.as_deref(),
+        Some("1111111111111111111111111111111111111111")
+    );
+    assert_eq!(
+        alias.after.rev.as_deref(),
+        Some("2222222222222222222222222222222222222222")
+    );
+    assert!(alias.changed);
+    assert!(normal.changed);
+}
+
+#[test]
+fn missing_follow_target_is_a_clear_error() {
+    let mut harness = Harness::new("follows-missing", "locks/follows.lock");
     harness.cli.all = true;
 
-    let error = harness.resolve().expect_err("follows root input must fail");
+    let error = harness
+        .resolve()
+        .expect_err("a missing follow target must fail");
+    let message = error.to_string();
 
-    assert!(error.to_string().contains("follows"));
+    assert!(message.contains("follows"));
+    assert!(message.contains("nixpkgs"));
     assert!(harness.invocations().is_empty());
+}
+
+#[test]
+fn follows_cycle_is_a_clear_error() {
+    let mut harness = Harness::new("follows-cycle", "locks/follows-cycle.lock");
+    harness.cli.all = true;
+
+    let error = harness.resolve().expect_err("a follows cycle must fail");
+
+    assert!(error.to_string().contains("cycle"));
+    assert!(harness.invocations().is_empty());
+}
+
+#[test]
+fn empty_root_selects_zero_inputs() {
+    let mut harness = Harness::new("empty-root", "locks/empty.lock");
+    harness.cli.all = true;
+    harness.respond(1, &Response::success(&fixture("locks/empty.lock")));
+
+    let resolution = harness.resolve().expect("an empty root should succeed");
+    let args = harness.first_invocation();
+    let temp = temp_lock(&args);
+
+    assert!(resolution.inputs().is_empty());
+    assert_eq!(args, update_args(&[], harness.flake(), &temp));
 }
 
 #[test]

@@ -48,7 +48,9 @@ The selected inputs are the names given with `--input`, every root input with
 selected input with a `changed` boolean. `changed` means the resolved `locked`
 object differs in any field; missing `lastModified` or `narHash` is omitted,
 not invented. Inputs are sorted by name. Unchanged inputs are still listed in
-JSON and text, with `changed: false`.
+JSON and text, with `changed: false`. A root input that follows another input
+resolves to its target's locked node, recursively; a missing target or a cycle
+is an error. A root node with an empty `inputs` map selects no inputs.
 
 ## Sequence
 

@@ -1,0 +1,16 @@
+{
+  "nodes": {
+    "root": {
+      "inputs": {
+        "first": {
+          "follows": "second"
+        },
+        "second": {
+          "follows": "first"
+        }
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

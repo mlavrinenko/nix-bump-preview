@@ -29,14 +29,14 @@ groups:
       CONTRIBUTING.md: b81b5d048e534b2a50e838da59664df3ca0610435cc49a5551bc31eab9ee57e8
   nix-pipeline:
     source:
-      src/lock.rs: 482c5dfee46373edbf18f8dc034a903210d096c64d01dd8d254cb60839f2edf6
-      src/lock_tests.rs: 639c04a6ad2f9c2da0583d012a29780640f2be813ac7ebefcdc17acd11f7c666
+      src/lock.rs: 3e8501edfb5cb7d6806660de79a9be793ed5d8e01dcddd5e6eb79e060e238b4b
+      src/lock_tests.rs: 42ca052af27a1728225b8c6eace86a78bf50f08f00c542676351c287287eb529
       src/nix.rs: 7565a70c2075faab2118025a33753c152407bc0caee0cacff8ba8eb73ed156e5
     dependents:
-      docs/design.md: 77975d05a517b0c210663f8f4a1c60d5b86e228db54206f93efd39e21d5639f9
+      docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
   product-docs:
     source:
-      docs/design.md: 77975d05a517b0c210663f8f4a1c60d5b86e228db54206f93efd39e21d5639f9
+      docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
       docs/goals.md: 764a255aa814caeba25f18e16b3d2184b9bee1dbb0da43fe0b639dbf2ba4c84e
       docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
     dependents:
@@ -47,7 +47,7 @@ groups:
     source:
       Cargo.toml: 512ba7444419f2880bf44b2125c341b21f1a605d88d3ba5033f9fafc69696f1a
     dependents:
-      CHANGELOG.md: b8dd76ad561c4dc5baf342ea910edd32d0c0c6a6865f1048a277947fe4ddcd25
+      CHANGELOG.md: 8ee41ef07adba3f21df4772c10816fd0f064ab34a680f405b41ec942c3ae080d
   report-contract:
     source:
       src/report.rs: bc43ad4f32298532041c7077cce7d582f72f9a8f074bda3e22fd1ada027cfb63

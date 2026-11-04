@@ -62,8 +62,8 @@ pub fn resolve(cli: &Cli, nix: &Nix) -> Result<Resolution, LockError> {
     validate_selection(cli)?;
     let flake = validate_flake(&cli.flake)?;
     let before = read_lock(&flake.join("flake.lock"))?;
-    let before_roots = root_inputs(&before)?;
-    let selection = select_inputs(cli, &before_roots)?;
+    let selection = select_inputs(cli, &root_names(&before)?)?;
+    let before_locked = selected_inputs(&before, &selection)?;
     let after_lock = match &cli.lock_file {
         Some(path) => AfterLock::Provided(path.clone()),
         None => AfterLock::Temporary(resolve_proposed(cli, nix, &flake, &selection)?),
@@ -72,8 +72,8 @@ pub fn resolve(cli: &Cli, nix: &Nix) -> Result<Resolution, LockError> {
         copy_keep_lock(after_lock.path(), destination)?;
     }
     let after = read_lock(after_lock.path())?;
-    let after_roots = root_inputs(&after)?;
-    let inputs = build_reports(&selection, &before_roots, &after_roots)?;
+    let after_locked = selected_inputs(&after, &selection)?;
+    let inputs = build_reports(&selection, &before_locked, &after_locked)?;
     Ok(Resolution {
         flake,
         inputs,
@@ -163,48 +163,84 @@ fn resolve_proposed(
     Ok(temp)
 }
 
-fn root_inputs(lock: &Value) -> Result<BTreeMap<String, Value>, LockError> {
-    let inputs = root_inputs_map(lock).ok_or(LockError::NoRootInputs)?;
-    let nodes = lock
-        .get("nodes")
-        .and_then(Value::as_object)
-        .ok_or(LockError::NoRootInputs)?;
-    let mut roots = BTreeMap::new();
-    for (name, spec) in inputs {
-        let node = node_reference(name, spec)?;
-        let locked = nodes
-            .get(&node)
-            .and_then(|node| node.get("locked"))
-            .filter(|locked| locked.is_object())
-            .ok_or_else(|| LockError::UnresolvedInput { name: name.clone() })?;
-        roots.insert(name.clone(), locked.clone());
-    }
-    Ok(roots)
+fn root_names(lock: &Value) -> Result<BTreeSet<String>, LockError> {
+    let inputs = root_inputs_map(lock)?;
+    Ok(inputs
+        .map(|inputs| inputs.keys().cloned().collect())
+        .unwrap_or_default())
 }
 
-fn root_inputs_map(lock: &Value) -> Option<&Map<String, Value>> {
-    let from_root_node = lock
-        .get("root")
-        .and_then(Value::as_str)
-        .and_then(|root| lock.get("nodes")?.get(root))
-        .and_then(|node| node.get("inputs"))
-        .and_then(Value::as_object);
-    if from_root_node.is_some() {
-        return from_root_node;
+fn root_inputs_map(lock: &Value) -> Result<Option<&Map<String, Value>>, LockError> {
+    if let Some(root) = lock.get("root").and_then(Value::as_str) {
+        let node = lock
+            .get("nodes")
+            .and_then(|nodes| nodes.get(root))
+            .ok_or(LockError::NoRoot)?;
+        return Ok(node.get("inputs").and_then(Value::as_object));
     }
-    lock.get("inputs").and_then(Value::as_object)
+    if let Some(inputs) = lock.get("inputs").and_then(Value::as_object) {
+        return Ok(Some(inputs));
+    }
+    Err(LockError::NoRoot)
 }
 
-fn node_reference(name: &str, spec: &Value) -> Result<String, LockError> {
-    match spec {
-        Value::String(node) => Ok(node.clone()),
-        Value::Object(map) => {
+fn select_inputs(cli: &Cli, roots: &BTreeSet<String>) -> Result<Vec<String>, LockError> {
+    if cli.lock_file.is_some() || cli.all {
+        return Ok(roots.iter().cloned().collect());
+    }
+    let mut names = BTreeSet::new();
+    for name in &cli.input {
+        if !roots.contains(name) {
+            return Err(LockError::UnknownInput { name: name.clone() });
+        }
+        names.insert(name.clone());
+    }
+    Ok(names.into_iter().collect())
+}
+
+fn selected_inputs(lock: &Value, names: &[String]) -> Result<BTreeMap<String, Value>, LockError> {
+    if names.is_empty() {
+        return Ok(BTreeMap::new());
+    }
+    let Some(inputs) = root_inputs_map(lock)? else {
+        return Ok(BTreeMap::new());
+    };
+    let mut locked = BTreeMap::new();
+    for name in names {
+        let mut visiting = BTreeSet::new();
+        locked.insert(
+            name.clone(),
+            resolve_root_input(lock, inputs, name, &mut visiting)?,
+        );
+    }
+    Ok(locked)
+}
+
+fn resolve_root_input(
+    lock: &Value,
+    inputs: &Map<String, Value>,
+    name: &str,
+    visiting: &mut BTreeSet<String>,
+) -> Result<Value, LockError> {
+    if !visiting.insert(name.to_owned()) {
+        return Err(LockError::FollowsCycle {
+            name: name.to_owned(),
+        });
+    }
+    let result = match inputs.get(name) {
+        Some(Value::String(node)) => locked_node(lock, node, name),
+        Some(Value::Object(map)) => {
             if let Some(Value::String(node)) = map.get("path") {
-                Ok(node.clone())
-            } else if map.contains_key("follows") {
-                Err(LockError::FollowsInput {
-                    name: name.to_owned(),
-                })
+                locked_node(lock, node, name)
+            } else if let Some(Value::String(target)) = map.get("follows") {
+                if inputs.contains_key(target) {
+                    resolve_root_input(lock, inputs, target, visiting)
+                } else {
+                    Err(LockError::FollowsMissing {
+                        name: name.to_owned(),
+                        target: target.clone(),
+                    })
+                }
             } else {
                 Err(LockError::UnresolvedInput {
                     name: name.to_owned(),
@@ -214,21 +250,20 @@ fn node_reference(name: &str, spec: &Value) -> Result<String, LockError> {
         _ => Err(LockError::UnresolvedInput {
             name: name.to_owned(),
         }),
-    }
+    };
+    visiting.remove(name);
+    result
 }
 
-fn select_inputs(cli: &Cli, before: &BTreeMap<String, Value>) -> Result<Vec<String>, LockError> {
-    if cli.lock_file.is_some() || cli.all {
-        return Ok(before.keys().cloned().collect());
-    }
-    let mut names = BTreeSet::new();
-    for name in &cli.input {
-        if !before.contains_key(name) {
-            return Err(LockError::UnknownInput { name: name.clone() });
-        }
-        names.insert(name.clone());
-    }
-    Ok(names.into_iter().collect())
+fn locked_node(lock: &Value, node: &str, input: &str) -> Result<Value, LockError> {
+    lock.get("nodes")
+        .and_then(|nodes| nodes.get(node))
+        .and_then(|node| node.get("locked"))
+        .filter(|locked| locked.is_object())
+        .cloned()
+        .ok_or_else(|| LockError::UnresolvedInput {
+            name: input.to_owned(),
+        })
 }
 
 fn build_reports(
@@ -360,38 +395,24 @@ pub enum LockError {
 
     /// The flake is a remote URL rather than a local directory.
     #[error("--flake must be a local directory, not a remote URL: {path}")]
-    RemoteFlake {
-        /// The value given to `--flake`.
-        path: String,
-    },
+    RemoteFlake { path: String },
 
     /// The flake directory does not exist.
     #[error("flake directory does not exist: {path}")]
-    MissingFlake {
-        /// The value given to `--flake`.
-        path: String,
-    },
+    MissingFlake { path: String },
 
     /// The flake path exists but is not a directory.
     #[error("flake path is not a directory: {path}")]
-    NotADirectory {
-        /// The canonical path.
-        path: String,
-    },
+    NotADirectory { path: String },
 
     /// The flake directory has no `flake.lock`.
     #[error("flake directory has no flake.lock: {path}")]
-    MissingFlakeLock {
-        /// The canonical directory.
-        path: String,
-    },
+    MissingFlakeLock { path: String },
 
     /// A lock file could not be read.
     #[error("cannot read {path}: {source}")]
     Read {
-        /// The path being read.
         path: String,
-        /// Underlying I/O error.
         #[source]
         source: io::Error,
     },
@@ -399,58 +420,43 @@ pub enum LockError {
     /// A lock file is not valid JSON.
     #[error("cannot parse {path}: {source}")]
     Parse {
-        /// The path being parsed.
         path: String,
-        /// Underlying JSON error.
         #[source]
         source: serde_json::Error,
     },
 
-    /// The lock has no root inputs to select from.
-    #[error("lock file has no root inputs")]
-    NoRootInputs,
+    /// The lock has no root node.
+    #[error("lock file has no root node")]
+    NoRoot,
 
     /// A root input does not point at a locked node.
     #[error("input '{name}' has no resolved locked node")]
-    UnresolvedInput {
-        /// Input name.
-        name: String,
-    },
+    UnresolvedInput { name: String },
 
-    /// A root input follows another input.
-    #[error("input '{name}' follows another input and cannot be selected directly")]
-    FollowsInput {
-        /// Input name.
-        name: String,
-    },
+    /// A follows root names an input that does not exist.
+    #[error("input '{name}' follows missing input '{target}'")]
+    FollowsMissing { name: String, target: String },
+
+    /// Follows roots form a cycle.
+    #[error("input '{name}' follows a cycle")]
+    FollowsCycle { name: String },
 
     /// `--input` named an input that is not a root input.
     #[error("input '{name}' is not a root input")]
-    UnknownInput {
-        /// Input name.
-        name: String,
-    },
+    UnknownInput { name: String },
 
     /// The proposed lock lacks an input present in the before lock.
     #[error("input '{name}' is missing from the proposed lock")]
-    MissingAfterInput {
-        /// Input name.
-        name: String,
-    },
+    MissingAfterInput { name: String },
 
     /// Nix exited successfully without writing the proposed lock.
     #[error("nix flake update did not write the proposed lock to {path}")]
-    MissingProposedLock {
-        /// The expected output path.
-        path: String,
-    },
+    MissingProposedLock { path: String },
 
     /// A unique temporary lock could not be created.
     #[error("cannot create a temporary lock in {dir}: {source}")]
     TempLock {
-        /// The temporary directory.
         dir: String,
-        /// Underlying I/O error.
         #[source]
         source: io::Error,
     },
@@ -458,9 +464,7 @@ pub enum LockError {
     /// The proposed lock could not be copied to `--keep-lock`.
     #[error("cannot copy the proposed lock to {path}: {source}")]
     KeepLock {
-        /// The destination path.
         path: String,
-        /// Underlying I/O error.
         #[source]
         source: io::Error,
     },

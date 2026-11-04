@@ -15,4 +15,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   JSON report types, committed schema, and `just schema` regeneration recipe.
 - The lock resolver, the typed Nix runner with `--nix-bin`/`NIX_BIN`
   resolution, the fake-Nix test fixture, and fixture locks proving `flake.lock`
-  stays untouched.
+  stays untouched. Follows roots resolve to their target, and an empty root is
+  a valid lock.
