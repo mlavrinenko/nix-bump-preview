@@ -41,9 +41,10 @@ these 671 paths will be fetched (3.0 GiB download, 8.4 GiB unpacked):
 Parse the counts and sizes. Support `B`, `KiB`, `MiB`, `GiB`, and `TiB` with
 binary multipliers. A fractional size such as `3.5 KiB` is parsed as a decimal
 and rounded half up to whole bytes. An overflow beyond `u64` is an error and
-exits 2. A missing header is zero. Singular and plural headers both work. Cost
-is per installable and is not merged across installables, because their
-closures may overlap.
+exits 2. A malformed header value, such as a non-numeric count or an unknown
+size unit, is an error. A missing header is zero. Singular and plural headers
+both work. Cost is per installable and is not merged across installables,
+because their closures may overlap.
 
 Text prints `X.Y` with one decimal in binary units, using the largest unit
 that keeps the value at or above 1. JSON stores whole bytes.

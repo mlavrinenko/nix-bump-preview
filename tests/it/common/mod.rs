@@ -82,6 +82,15 @@ impl<'a> Response<'a> {
         }
     }
 
+    pub fn stderr(stderr: &'a str) -> Self {
+        Self {
+            status: 0,
+            stdout: "",
+            stderr,
+            lock: None,
+        }
+    }
+
     pub fn with_stderr(mut self, stderr: &'a str) -> Self {
         self.stderr = stderr;
         self

@@ -1,0 +1,2 @@
+this derivation will be built:
+  /nix/store/nm6xi7w76sh8p165nbf16d444igyx3n5-cost-example-1.0.drv

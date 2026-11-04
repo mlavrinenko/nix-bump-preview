@@ -24,3 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `nix store diff-closures --derivation`, grouping versions by package,
   accepting both arrow glyphs and the empty-version markers, stripping size
   suffixes, and warning about malformed lines.
+- The build and fetch cost parser for `nix build --dry-run`, reading both plan
+  headers, summing repeated headers, accepting singular and plural counts, and
+  converting binary-unit sizes with exact half-up rounding.

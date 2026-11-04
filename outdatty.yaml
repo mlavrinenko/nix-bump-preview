@@ -62,6 +62,15 @@ groups:
       - docs/report.md
       - docs/design.md
 
+  # The cost parser implements the cost contract: docs/report.md defines what
+  # it parses and docs/design.md the dry-run call it must make.
+  - name: cost-pipeline
+    source:
+      - "{src,crates/*/src}/cost*.rs"
+    dependents:
+      - docs/report.md
+      - docs/design.md
+
   # The report types produce the committed JSON schema, and the report contract
   # and README describe the same object. A type change flags each dependent.
   - name: report-contract
