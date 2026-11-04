@@ -25,8 +25,9 @@ warning: the delta is the build-time derivation graph, not the runtime closure
 
 The project is scaffolded. The MVP work is tracked in
 [`backlog/tasks/mvp/`](backlog/tasks/mvp/). The product and process goals are in
-[`docs/goals.md`](docs/goals.md), and the CLI and JSON contract is in
-[`docs/design.md`](docs/design.md).
+[`docs/goals.md`](docs/goals.md), the command and safety contract is in
+[`docs/design.md`](docs/design.md), and the report contract is in
+[`docs/report.md`](docs/report.md).
 
 ## How it works
 
@@ -76,7 +77,7 @@ Prerequisites: [Nix](https://nixos.org/) with flakes enabled.
 direnv allow         # or: nix develop
 just install-hooks   # pre-commit hook running the (memoized) gate
 
-just check           # fmt, clippy, tests, unused deps, file size, drift, copy-paste
+just check           # fmt, clippy, tests, unused deps, file size, tasks, drift, copy-paste
 just deny            # cargo-deny: advisories, licenses, bans (needs network)
 just build
 just test

@@ -71,7 +71,17 @@ scopes:
     - "CONTRIBUTING.md"
     - "AGENTS.md"
     - "CHANGELOG.md"
+    - "docs/**"
     - "www/**"
+
+  # What decides a valid task: the config, templates and goals. The task files
+  # under backlog/ are left out on purpose: `mt flip` writes the file its close
+  # gate asserts on, so a multi-task close would stale itself mid-command.
+  tasks:
+    - ".mindtape/config.toml"
+    - ".mindtape/templates/**"
+    - "docs/goals.md"
+    - "docs/design.md"
 
   # `just crap` reads the lcov `just cover` wrote. It is gitignored (it lives
   # under target/), which is exactly why it is spelled as a LITERAL path: mmz's
@@ -151,6 +161,10 @@ commands:
   - name: just check-dry
     tags: [gate]
     inputs: [rust, gates-meta]
+
+  - name: just check-tasks
+    tags: [gate]
+    inputs: [tasks, gates-meta]
 
   # outdatty re-reads every dependent's current content and compares it to the
   # lock; `outdatty-config` covers the lock and the group definitions directly.

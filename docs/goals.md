@@ -48,7 +48,8 @@ at all.
 Hardcode no flake path, input name, host, system, package set, or installable.
 
 Acid test: integration tests use two unrelated flakes and installables, and a
-repository search finds no personal hostname, path, or user name.
+repository search finds no private hostname, local flake path, OS user name, or
+machine-specific package set.
 
 ### `machine-readable`
 
@@ -87,8 +88,11 @@ not runtime dependencies. The tool builds argv arrays and reads Nix's output.
 
 ### `no-personal`
 
-No personal hostname, flake name, path, user name, or task refers to a
-maintainer's machine. Examples use placeholders such as `<host>`.
+No private machine detail appears anywhere: local hostname, local flake path,
+OS user name, system name, or a package set specific to one machine. Examples
+use placeholders such as `<host>` and `nixosConfigurations.example`. The public
+repository owner, repository URL, license attribution, dependency URLs, and
+generic placeholder examples are allowed.
 
 ### `focused`
 

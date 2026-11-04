@@ -1,7 +1,9 @@
 # Design
 
-This document is the source of truth for the CLI and report contract. A task
-that changes either updates this file and its examples in the same commit.
+This document is the source of truth for the command, the run sequence, the Nix
+calls, and the safety invariants. The delta, cost, JSON, text, and test
+contracts are in [report.md](report.md). A task that changes either contract
+updates the document and its examples in the same commit.
 
 ## Command
 
@@ -9,8 +11,10 @@ that changes either updates this file and its examples in the same commit.
 nix-bump-preview --input <name>... --installable <attr>... [options]
 ```
 
-`--flake` defaults to `.` and must be a local directory. Resolving a remote
-flake is out of scope for the MVP.
+`--flake` defaults to `.` and must be a local directory containing
+`flake.lock`. The path is canonicalized before it enters the report. Remote
+flake URLs, missing directories, and directories without a lock exit 2 before
+any Nix call.
 
 ## Options
 
@@ -24,24 +28,35 @@ flake is out of scope for the MVP.
 | `--attr <ATTR>` | Attr with a `.version` for a direct version delta; repeatable |
 | `--format <text\|json>` | Output format, default `text` |
 | `--keep-lock <PATH>` | Copy the generated proposed lock to `PATH` |
-| `--no-delta` | Skip the package delta |
-| `--no-cost` | Skip the build and fetch cost |
+| `--no-delta` | Skip the package delta and its Nix call |
+| `--no-cost` | Skip the build and fetch cost and its Nix call |
 | `--exit-code` | Exit 1 when a change or build cost exists, else 0 |
-| `--nix-bin <PATH>` | Nix executable, default `nix`; also `NIX_BIN`; hidden |
+| `--nix-bin <PATH>` | Nix executable, default `nix`; flag wins over `NIX_BIN` |
+| `--print-schema` | Print the JSON schema and exit; hidden developer flag |
 | `-h, --help`, `-V, --version` | Standard |
 
 `--input` or `--all` is required unless `--lock-file` is given. `--lock-file`
 with `--input` or `--all` is an error. `--keep-lock` with `--lock-file` is an
-error. `--flake` must contain `flake.lock`.
+error. `--keep-lock` creates missing parent directories and overwrites an
+existing file. The temp lock lives in the system temp directory and is removed
+after the run unless `--keep-lock` copied it.
+
+### Input reporting
+
+The selected inputs are the names given with `--input`, every root input with
+`--all`, and every root input with `--lock-file`. The report includes every
+selected input with a `changed` boolean. `changed` means the resolved `locked`
+object differs in any field; missing `lastModified` or `narHash` is omitted,
+not invented. Inputs are sorted by name. Unchanged inputs are still listed in
+JSON and text, with `changed: false`.
 
 ## Sequence
 
-1. Read `$flake/flake.lock` as the before lock.
+1. Validate `--flake` and read `$flake/flake.lock` as the before lock.
 2. If `--lock-file` is absent, run `nix flake update` for the named inputs or
    `--all`, writing only `--output-lock-file <temp>`. If present, use it as the
    after lock and resolve nothing.
-3. Compare every selected root input's resolved `locked` object in the before
-   and after locks. Report the input names that changed.
+3. Compare every selected input's resolved `locked` object in both locks.
 4. For each `--installable`, evaluate the old `.drv` with the before lock and
    the new `.drv` with the after lock.
 5. Unless `--no-delta`, run the derivation-graph delta and parse it. Unless
@@ -50,12 +65,20 @@ error. `--flake` must contain `flake.lock`.
 7. Render text or JSON. Remove the temporary lock unless `--keep-lock` copied
    it.
 
+`lib::run(cli)` owns steps 1-7. `main.rs` parses arguments, initialises logging,
+calls `run`, and maps the result to an exit code. `--no-delta` and `--no-cost`
+must skip their Nix calls, not only their output sections.
+
+Installables are reported in CLI order. Attrs are reported in CLI order.
+Package changes are sorted by name. Inputs are sorted by name.
+
 ## Nix calls
 
 Every call is an argv array. Never pass a shell string to `sh -c`.
 
 ```text
 nix flake update <input>... --flake <flake> --output-lock-file <tmp>
+nix flake update --flake <flake> --output-lock-file <tmp>          # --all
 nix path-info --derivation --no-write-lock-file <flake>#<installable>
 nix path-info --derivation --no-write-lock-file \
   --reference-lock-file <after> <flake>#<installable>
@@ -71,6 +94,9 @@ nix eval --raw --no-write-lock-file \
 metadata. They must not realize the target outputs. `nix store diff-closures`
 must always carry `--derivation`; without it Nix realizes the new closure.
 
+`--nix-bin` wins over `NIX_BIN`; both win over the default `nix`. A relative
+path is resolved against the current working directory before spawning.
+
 ## Safety invariants
 
 - `flake.lock` is never written. Only `--output-lock-file` and
@@ -82,113 +108,13 @@ must always carry `--derivation`; without it Nix realizes the new closure.
   copies it before cleanup.
 - Nix stderr is captured and included in the error. A failed call names the
   argv and exits 2.
+- A failure before rendering emits no partial report.
 
-## Delta parsing
+## JSON schema
 
-`nix store diff-closures --derivation` prints package lines such as:
-
-```text
-zed-editor: 1.24.2 -> 1.25.2, +12.3 MiB
-libfoo: 1.0, 1.1 -> 1.2
-newpkg: ∅ -> 2.0
-oldpkg: 1.0 -> ∅
-empty: ε -> 1.0
-```
-
-Accept both `->` and `→`. Split the left and right version lists on commas.
-`∅` and `ε` mean no version. Keep a line only when the before and after version
-sets differ. Ignore size-only lines and malformed lines with a warning. Sort
-changes by package name.
-
-The result is the build-time derivation graph, not the realized runtime
-closure. Both text and JSON say so.
-
-## Cost parsing
-
-`nix build --dry-run` prints headers to stderr:
-
-```text
-these 721 derivations will be built:
-these 671 paths will be fetched (3.0 GiB download, 8.4 GiB unpacked):
-```
-
-Parse the counts and sizes. Support `B`, `KiB`, `MiB`, `GiB`, `TiB` with binary
-multipliers. Report zero when a header is absent. Cost is per installable; do
-not merge installables, because their closures may overlap.
-
-## JSON
-
-`--format json` prints one object. The committed schema is
-`schema/report.schema.json`.
-
-```json
-{
-  "schemaVersion": 1,
-  "flake": "/absolute/path",
-  "inputs": [
-    {
-      "name": "unstable",
-      "before": { "rev": "...", "lastModified": 1792094642, "narHash": "..." },
-      "after":  { "rev": "...", "lastModified": 1792773339, "narHash": "..." }
-    }
-  ],
-  "installables": [
-    {
-      "attr": "nixosConfigurations.example.config.system.build.toplevel",
-      "before": { "drvPath": "/nix/store/...drv" },
-      "after":  { "drvPath": "/nix/store/...drv" },
-      "delta": {
-        "approximation": "build-graph",
-        "changes": [
-          { "name": "zed-editor", "kind": "changed",
-            "before": ["1.24.2"], "after": ["1.25.2"] }
-        ]
-      },
-      "cost": { "toBuild": 721, "toFetch": 671,
-                "downloadBytes": 3221225472, "unpackedBytes": 9019431321 }
-    }
-  ],
-  "attrs": [
-    { "attr": "nixosConfigurations.example._module.args.pkgs.unstable.zed-editor",
-      "before": "1.24.2", "after": "1.25.2" }
-  ],
-  "warnings": ["the delta is the build-time derivation graph, not the runtime closure"]
-}
-```
-
-`delta`, `cost`, `attrs`, and `warnings` are omitted when empty or not
-computed. `kind` is `added`, `removed`, or `changed`.
-
-## Text
-
-```text
-input unstable
-  fe132422 (2026-10-15) -> 3ec63636 (2026-10-23)
-installable nixosConfigurations.example.config.system.build.toplevel
-  delta (build graph): 449 changes
-    zed-editor 1.24.2 -> 1.25.2
-  cost: 721 to build, 671 to fetch (3.0 GiB download, 8.4 GiB unpacked)
-warning: the delta is the build-time derivation graph, not the runtime closure
-```
-
-Text lists every parsed change. `--format json` is the scripting surface.
-
-## Exit codes
-
-- `0` success, no `--exit-code` change.
-- `1` success with `--exit-code` when an input changed, a package changed, or
-  `toBuild + toFetch > 0`.
-- `2` usage or Nix error.
-
-## Testing
-
-A fake `nix` executable is injected with `--nix-bin`. It records argv in a log
-and prints canned stdout and stderr. Tests assert the exact argv, so a missing
-`--dry-run` or `--derivation` fails the suite.
-
-Fixture locks cover input comparison. Captured real output covers the delta and
-cost parsers. A real-Nix test is `#[ignore]` and runs only when a local fixture
-flake is supplied.
+`schema/report.schema.json` is generated from the Rust types and committed.
+`--print-schema` prints the generated schema. A test compares the printed
+schema to the committed file and fails on drift.
 
 ## Out of scope
 

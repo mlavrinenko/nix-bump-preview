@@ -38,7 +38,7 @@ fix-check: eject clippy-fix fmt check
 # and `mmz --is-fresh --tag gate` asserts they all passed without running any.
 # Per-rule scopes and the `gate` tag live in .mmz/config.yaml.
 [parallel]
-check: (mmz "fmt-check") (mmz "clippy") (mmz "test") (mmz "machete") (mmz "check-file-size") (mmz "check-dry") (mmz "outdatty-check")
+check: (mmz "fmt-check") (mmz "clippy") (mmz "test") (mmz "machete") (mmz "check-file-size") (mmz "check-dry") (mmz "check-tasks") (mmz "outdatty-check")
 
 # Wrap a just recipe in mmz: `just mmz fmt-check` runs `mmz just fmt-check`. The
 # double hop makes mmz the cache identity (rule name `just <recipe>` in
@@ -59,6 +59,10 @@ mmz *ARGS:
 # gate` would pass right now. Reads mmz's records; runs no gate.
 status:
     mmz --status
+
+# Validate the task backlog. CI has no MindTape; the commit hooks run it.
+check-tasks:
+    if [ -n "$CI" ]; then echo "check-tasks: skipped on CI, which has no MindTape"; elif ! command -v mt >/dev/null; then echo "check-tasks: skipped, no MindTape on PATH" >&2; else mt check -q; fi
 
 # Fail if a source changed without its dependents being re-confirmed
 outdatty-check:

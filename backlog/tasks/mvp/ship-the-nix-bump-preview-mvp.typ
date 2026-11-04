@@ -29,7 +29,6 @@ must preview a flake input bump end to end: resolve a proposed lock without
 touching `flake.lock`, evaluate old and proposed derivations, report package
 version changes, report build and fetch cost, and emit stable JSON.
 
-
 == Goals
 
 - Product: `proposed-lock`, `package-delta`, `build-cost`, `no-build`,
@@ -37,16 +36,16 @@ version changes, report build and fetch cost, and emit stable JSON.
 - Process: `test-first`, `parsers-tested`, `nix-only`, `no-personal`,
   `focused`.
 
-
 == Acceptance criteria
 
 - Every child task is done and its acceptance criteria pass.
 - `just check` is green on the merged result.
 - `cargo run -- --help` shows the contract in `docs/design.md`.
 - `--format json` validates against `schema/report.schema.json`.
-- A repository search finds no personal hostname, flake path, user name, or
-  system reference in code, docs, tests, fixtures, or tasks.
-
+- A repository search finds no private hostname, local flake path, OS user
+  name, system name, or machine-specific package set in code, docs, tests,
+  fixtures, or tasks. The public repository owner, repository URL, license
+  attribution, dependency URLs, and placeholder examples are allowed.
 
 == Non-goals
 
@@ -55,10 +54,9 @@ version changes, report build and fetch cost, and emit stable JSON.
 - Exact runtime closures from `.drv` files alone.
 - Replacing `canibump` or `nix-why-build`.
 
-
 == Files
 
 - `backlog/tasks/mvp/` (this milestone and its children)
 - `docs/design.md`
+- `docs/report.md`
 - `docs/goals.md`
-

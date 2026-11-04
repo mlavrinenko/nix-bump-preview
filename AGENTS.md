@@ -5,11 +5,15 @@
 - The product and process goals live in [docs/goals.md](docs/goals.md). Every
   open task names the goals it serves in its `Goals` section. A task that
   serves none is not ready to start.
-- The CLI and JSON contract lives in [docs/design.md](docs/design.md). Change
-  the contract and its examples in the same commit as the code.
-- Keep the project generic. No hostname, flake path, user name, package set, or
-  personal system belongs in code, docs, tests, fixtures, or tasks. Examples
-  use placeholders such as `<host>`.
+- The command and safety contract lives in [docs/design.md](docs/design.md).
+  The delta, cost, JSON, text, and test contract lives in
+  [docs/report.md](docs/report.md). Change the contract and its examples in the
+  same commit as the code.
+- Keep the project generic. No private hostname, local flake path, OS user
+  name, system name, or machine-specific package set belongs in code, docs,
+  tests, fixtures, or tasks. The public repository owner, repository URL,
+  license attribution, dependency URLs, and placeholders such as `<host>` and
+  `nixosConfigurations.example` are allowed.
 - Nix is the only external program. Build argv arrays; never pass a shell
   string to `sh -c`. Do not add a runtime dependency on `nvd`, `dix`, `jq`, or
   another diff engine.
