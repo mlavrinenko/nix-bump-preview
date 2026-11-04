@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A green `just crap` prints nothing: the gate uses cargo-crap's `github`
   format and keeps one line per failing function.
+- `just release` works against an empty origin. The hook no longer refuses a
+  repository whose first push creates `main`.
 
 ### Added
 

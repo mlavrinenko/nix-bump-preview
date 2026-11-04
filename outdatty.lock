@@ -37,7 +37,7 @@ groups:
       .just/scripts/lcov-stale-reason.sh: 94098a9dec36004f871abb68a4481ad1948d90289cfbdc34fbe000ee48b17d2c
       .just/scripts/mutants-diff.sh: afbea68683337c95033ec339748942a85a0d19d5b222a7b8cc00bf1da5d43252
       .just/scripts/release-ci.sh: ed02a07820a1d3282d3269fd48ca6940d101ecfd98ac496d60cf2326769e7fba
-      .just/scripts/release-hook.sh: 91afbe17d97053194cb2bb9819c8f68f5cd81c18eb087b1388beae48c3c4a83d
+      .just/scripts/release-hook.sh: f2d22b737eac93deb6ad3988fecea1e9ac367b58357ee3d70070ac4c926914e2
       .just/scripts/release.sh: 3dd521ea390f0c43882febb78c165fdd4cb21b1605c6de92222f62dbba146020
       .just/scripts/schema.sh: 4e75ffdf9542586ed739ebc7743af303845fcbbb41e1fd6173869014b976e376
       .just/scripts/test.sh: 805b1bd4b3599bbac230370006908b20ba23c4d5284439b79b5056d2ca326153
@@ -78,7 +78,7 @@ groups:
     source:
       Cargo.toml: 492b6cdbf6b9c101b10c646a432869ac5103c7876304927b5ba4c781a8fa2b7f
     dependents:
-      CHANGELOG.md: 0511000667dc200707fca75fb8d739a199e5bdb9545fa4e59d03ebc5657cca6c
+      CHANGELOG.md: 7d27a83564e5b81ff8a8ed697af6d49e1ebc739e5dc1d7b3ade0aaa4d4051603
   report-contract:
     source:
       src/report.rs: d393c6991db6b51e9162143e77d04a91c6cd10d2473895d6cc26f991c496fcb5
