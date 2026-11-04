@@ -121,7 +121,7 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v2.9.1
+      - uses: Swatinem/rust-cache@v2.9.3
         with:
           key: ${{ matrix.target }}
 
@@ -168,7 +168,7 @@ jobs:
         with:
           toolchain: stable
 
-      - uses: Swatinem/rust-cache@v2.9.1
+      - uses: Swatinem/rust-cache@v2.9.3
 
       # crates.io attaches a Trusted Publisher only to a crate that already
       # exists, so the first publish uses a scoped CARGO_REGISTRY_TOKEN. Once
