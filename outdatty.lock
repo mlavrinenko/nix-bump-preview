@@ -1,0 +1,41 @@
+version: 1
+algorithm: blake3
+groups:
+  cli-docs:
+    source:
+      src/lib.rs: b094bc298a082dd49edd9b158ca69e6eec21bc4bc51efd1f1d48ca97527c270f
+      src/main.rs: 88851485a3a4e2449f8ae397c23b1fa06d4efc22af74f23f9d327c197dd2eaac
+    dependents:
+      README.md: ca1f5d7e4bbf7e19de72dea5a9c0019baedd869ab62ca1fc2765c6b0ee8c62b8
+      www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
+  dev-docs:
+    source:
+      .config/nextest.toml: ec97d2444d9bf38aae8499d53eac3ffbbab47593637e3a324452ee72bec0ef0b
+      .config/wt.toml: bb5f2bf7ddc784fa863bf26c8032d6796e40423e6359b882d2775d7b3678b81f
+      .gitattributes: b55e965c925508ef4c91d244e509087fcadfa30a2672d2447c934359e2f4d273
+      .just/scripts/land-repro.sh: e31a682f0976c2d3e865c9df4db10f866e899a979f5a4be120fbda0884d794a6
+      .just/scripts/release-ci.sh: ed02a07820a1d3282d3269fd48ca6940d101ecfd98ac496d60cf2326769e7fba
+      .just/scripts/release-hook.sh: 91afbe17d97053194cb2bb9819c8f68f5cd81c18eb087b1388beae48c3c4a83d
+      .just/scripts/wt-carry-lcov.sh: 8029a70af112114038526ec8d9024911b3a02f86c4c50c78cf7174d092852d1b
+      .just/scripts/wt-lock.sh: bffd3f7179331f0216babfb9361b8b5e278eedb0f367a7ba163aec5c0e913b52
+      .just/scripts/wt-tasks.sh: 976cf0f488e5f96f9cb906e2a83d696d0b0107f2b74edc90fcb301c165df3d14
+      .mmz/config.yaml: bc0025bcc1210c71b1f99ed96e1654d40239ba69b35aab011bc7be978eb28cd8
+      Justfile: 52d2c3f8caafcb798757c061071d26b304f09403103146f76035c32af778f868
+      flake.nix: abf19e16ee253fbee69f5dc07cd8e29354b870a4cc73428ba37cb5b8b88b4af3
+      release.toml: 3474c8b3a3834220a00e31b084e769d8ca3cb60095280f6b6e70619723b5e021
+    dependents:
+      AGENTS.md: bf01962da93517fedd5417bcf8fc7f83a8b29961950c5ddc8e14862510132986
+      CONTRIBUTING.md: b81b5d048e534b2a50e838da59664df3ca0610435cc49a5551bc31eab9ee57e8
+  product-docs:
+    source:
+      docs/design.md: 2688bee6ea737a1a2622dd98c0a2c5f82ee7a9d0afdbe61559a5e2e3fe16eeb9
+      docs/goals.md: f96b4e91dd491809f7119406a7aee174e7a1a8b056092388b542cf56a2d6d075
+    dependents:
+      AGENTS.md: bf01962da93517fedd5417bcf8fc7f83a8b29961950c5ddc8e14862510132986
+      README.md: ca1f5d7e4bbf7e19de72dea5a9c0019baedd869ab62ca1fc2765c6b0ee8c62b8
+      www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
+  release-notes:
+    source:
+      Cargo.toml: 1d1d485ddaa5c5b616db5d4f43522aea7a8f0e40f92689465163364370ad8857
+    dependents:
+      CHANGELOG.md: 3f543159c62cbbb2b2cad369cf88b55e54fe223c38fe985385bd731d0783480c

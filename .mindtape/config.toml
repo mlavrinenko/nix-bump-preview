@@ -1,0 +1,185 @@
+# .mindtape/config.toml — nix-bump-preview's MVP backlog.
+#
+# The task shape is deliberately small: Summary, Goals, Acceptance criteria,
+# Non-goals, Files. Every open task names the product and process goals it
+# serves, so a session can reject work that helps nothing.
+#
+# This file is project-generic. No personal host, flake or path belongs here.
+
+# Lifecycle: proposed -> wip -> done, with blocked and cancelled as exits.
+[[tasks.status]]
+value = "proposed"
+glyph = "💡"
+color = "blue"
+to = ["wip", "cancelled"]
+
+[[tasks.status]]
+value = "wip"
+glyph = "🔨"
+color = "yellow"
+to = ["blocked", "done", "cancelled"]
+unblocked = true
+
+[[tasks.status]]
+value = "blocked"
+glyph = "🔒"
+color = "red"
+to = ["wip", "cancelled"]
+
+[[tasks.status]]
+value = "done"
+glyph = "✅"
+color = "green"
+terminal = true
+to = ["wip"]
+unblocked = true
+
+[[tasks.status]]
+value = "cancelled"
+glyph = "🚫"
+color = "magenta"
+terminal = true
+
+# Priority: ICE, but a plain integer is accepted when the scorer is not useful.
+[tasks.priority]
+kind = "int"
+min = 0
+max = 9
+framework = "ice"
+allow-manual = true
+
+# The MVP backlog lives here. `nbp` is a derived tag on every task.
+[[tasks.roots]]
+path = "backlog/tasks/mvp"
+name = "nbp"
+derive-tags = true
+
+[tasks.derive-tags]
+enabled = true
+collect = ["segments"]
+
+# A task estimates non-test source files it means to touch.
+[tasks.estimate]
+units = ["src-files"]
+required = "!terminal"
+example = { src-files = 3 }
+
+[tasks.difficulty]
+required = "!terminal"
+example = 3
+
+[tasks.assignee]
+allowed = ["max", "agent"]
+required = "!terminal"
+example = "agent"
+
+[tasks.fields.kind]
+values = ["feat", "fix", "refactor", "docs", "test", "dev", "milestone", "decision"]
+required = "!terminal"
+example = "feat"
+
+[tasks.tags]
+allowed = [
+  "nbp",
+  "mvp",
+  "cli",
+  "lock",
+  "eval",
+  "delta",
+  "cost",
+  "json",
+  "tests",
+  "docs",
+  "tooling",
+  "decision",
+  "found",
+  "tweak",
+]
+
+[tasks.comments]
+policy = "forbid"
+
+# Body sections. A task that cannot name its goals is not ready to start.
+[[tasks.body.headers.rules]]
+path = ["Summary"]
+action = "unique"
+when = "!terminal"
+message = "keep exactly one Summary section, stating the problem once"
+
+[[tasks.body.headers.rules]]
+path = ["Goals"]
+action = "unique"
+when = "!terminal"
+message = "add one Goals section naming the product and process goals this task serves"
+
+[[tasks.body.headers.rules]]
+path = ["Acceptance criteria"]
+action = "unique"
+when = "!terminal"
+message = "add an Acceptance criteria section of checkable conditions"
+
+[[tasks.body.headers.rules]]
+path = ["Non-goals"]
+action = "require"
+when = "!terminal"
+message = "add a Non-goals section naming what the task will not touch"
+
+[[tasks.body.headers.rules]]
+path = ["Files"]
+action = "require"
+when = "!terminal"
+message = "add a Files section listing the paths the task expects to touch"
+
+[[tasks.body.headers.rules]]
+action = "order"
+before = ["Summary"]
+after = ["Goals"]
+message = "move Summary before Goals"
+
+[[tasks.body.headers.rules]]
+action = "order"
+before = ["Goals"]
+after = ["Acceptance criteria"]
+message = "move Goals before Acceptance criteria"
+
+[[tasks.body.headers.rules]]
+action = "order"
+before = ["Acceptance criteria"]
+after = ["Non-goals"]
+message = "move Acceptance criteria before Non-goals"
+
+[[tasks.body.headers.rules]]
+action = "order"
+before = ["Non-goals"]
+after = ["Files"]
+message = "move Non-goals before Files"
+
+[[tasks.body.content.rules]]
+name = "goals-non-empty"
+path = ["Goals"]
+assert = "non-empty"
+when = "!terminal"
+message = "name the product and process goals this task serves, or say why it serves none"
+
+[[roles]]
+name = "maintainer"
+
+[[actors]]
+name = "max"
+kind = "human"
+roles = ["maintainer"]
+
+[[actors]]
+name = "agent"
+kind = "llm"
+
+[views.agent]
+filter = 'assignee == "agent" && !terminal'
+sort = ["priority:desc"]
+description = "Open tasks an agent can take"
+
+[views.blocked]
+filter = "blocked"
+sort = ["blocks:desc", "priority:desc"]
+columns = ["slug#", "title", "why"]
+description = "Blocked tasks and what each waits on"
