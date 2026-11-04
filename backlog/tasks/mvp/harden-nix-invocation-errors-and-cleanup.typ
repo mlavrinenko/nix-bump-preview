@@ -8,7 +8,7 @@
   kind: "refactor",
   assignee: "agent",
   estimate: (src-files: 2),
-  status: wip(2026, 11, 4),
+  status: done(2026, 11, 4),
   links: parent("ship-the-nix-bump-preview-mvp.typ")
     + depends-on("parse-the-build-and-fetch-cost.typ"),
 )
