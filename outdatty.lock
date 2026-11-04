@@ -60,7 +60,7 @@ groups:
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
   release-notes:
     source:
-      Cargo.toml: 512ba7444419f2880bf44b2125c341b21f1a605d88d3ba5033f9fafc69696f1a
+      Cargo.toml: 6a7ac401aa23dd5650885c525ce8cb4cb6a3789f311574766bfd4c57663fd8ee
     dependents:
       CHANGELOG.md: 6478d5f1cc32d52598dd9c33d6e3e2b6dc452af1beffe56c88ceccc4c05c8d5e
   report-contract:
