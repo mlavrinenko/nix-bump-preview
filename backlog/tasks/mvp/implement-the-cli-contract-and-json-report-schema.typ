@@ -30,18 +30,21 @@ Source of truth: `docs/design.md` sections Command, Options, and JSON schema;
 == Acceptance criteria
 
 - `src/cli.rs` defines every option in `docs/design.md` with `clap`, including
-  `--print-schema`, the hidden `--nix-bin`, and the `--format text|json`
-  choice. `--nix-bin` reads `NIX_BIN` through clap's `env` feature.
+  the hidden `--print-schema`, the hidden `--nix-bin`, and the
+  `--format text|json` choice. `--nix-bin` reads `NIX_BIN` through clap's
+  `env` feature.
 - Missing `--installable`, missing `--input`/`--all` without `--lock-file`,
   conflicting `--lock-file`/`--input`, and `--keep-lock` with `--lock-file`
   exit 2 with a useful message.
 - `src/report.rs` freezes the complete JSON object in `docs/report.md`: every
   field, camelCase name, optional field, array order, and omission rule.
-  `schemaVersion` is 1.
+  `schemaVersion` is 1. `rev`, `lastModified`, and `narHash` are optional
+  strings or integers, so a path input with no `rev` still serializes.
 - `schema/report.schema.json` is generated with `schemars` and committed.
-  `--print-schema` prints the generated schema. A test compares the printed
-  schema to the committed file and fails on drift. Add a `just schema` recipe
-  that regenerates the file through the binary.
+  `--print-schema` works with no other argument, is handled before validation,
+  prints the generated schema, and exits 0. A test compares the printed schema
+  to the committed file and fails on drift. Add a `just schema` recipe that
+  regenerates the file through the binary.
 - `src/lib.rs` declares `pub mod cli;` and `pub mod report;`. `tests/it/main.rs`
   declares `mod cli;`. Keep `main.rs` thin: parse, initialise logging, call
   `run`, map the error to exit 2.

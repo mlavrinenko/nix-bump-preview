@@ -37,8 +37,8 @@ Source of truth: `docs/report.md` section Delta parsing.
 - Group by package name, union the before and after version sets, and keep one
   entry when the sets differ. A size-only line is skipped without a warning.
 - A malformed line appends exactly
-  `warning: ignored malformed diff line: <line>` to the top-level warning
-  list, in input order. The parser never panics.
+  `ignored malformed diff line: <line>` to the top-level warning list, in input
+  order. Text adds the `warning: ` prefix. The parser never panics.
 - Changes are sorted by package name and classified as `added`, `removed`, or
   `changed`.
 - The command builder always includes `--derivation`. A fake-Nix test asserts

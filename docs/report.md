@@ -21,8 +21,9 @@ Accept both `->` and `→`. Split the left and right version lists on commas.
 `∅` and `ε` mean no version. Group by package name, union the before and after
 version sets, and keep one entry when the sets differ. A size-only line is
 skipped without a warning because it is not a version change. A malformed line
-appends exactly `warning: ignored malformed diff line: <line>` to the top-level
-warnings, in input order. The parser never panics.
+appends exactly `ignored malformed diff line: <line>` to the top-level warning
+list, in input order. Text adds the `warning: ` prefix when it prints the list.
+The parser never panics.
 
 Changes are sorted by package name and classified as `added`, `removed`, or
 `changed`. The result is the build-time derivation graph, not the realized
@@ -44,9 +45,8 @@ exits 2. A missing header is zero. Singular and plural headers both work. Cost
 is per installable and is not merged across installables, because their
 closures may overlap.
 
-Text prints `X.Y` with one decimal in binary units, trimming a trailing `.0`
-and using the largest unit that keeps the value at or above 1. JSON stores
-whole bytes.
+Text prints `X.Y` with one decimal in binary units, using the largest unit
+that keeps the value at or above 1. JSON stores whole bytes.
 
 ## JSON
 
@@ -78,7 +78,7 @@ camelCase names. The committed schema is `schema/report.schema.json`.
         ]
       },
       "cost": { "toBuild": 721, "toFetch": 671,
-                "downloadBytes": 3221225472, "unpackedBytes": 9019431321 }
+                "downloadBytes": 3221225472, "unpackedBytes": 9019431322 }
     }
   ],
   "attrs": [
@@ -90,21 +90,22 @@ camelCase names. The committed schema is `schema/report.schema.json`.
 ```
 
 `delta`, `cost`, `attrs`, and `warnings` are omitted when empty or not
-computed. `before` and `after` on an input omit `lastModified` or `narHash` when
-the lock lacks them. `kind` is `added`, `removed`, or `changed`. Arrays preserve
-CLI order except `inputs` and `delta.changes`, which are sorted by name.
+computed. `before` and `after` on an input omit `rev`, `lastModified`, or
+`narHash` when the lock lacks them. `kind` is `added`, `removed`, or `changed`.
+Arrays preserve CLI order except `inputs` and `delta.changes`, which are sorted
+by name.
 
 ## Text
 
 ```text
+input nixpkgs: unchanged
 input unstable
   fe132422 (2026-10-15) -> 3ec63636 (2026-10-23)
-input nixpkgs: unchanged
 installable nixosConfigurations.example.config.system.build.toplevel
   delta (build graph): 449 changes
-    zed-editor 1.24.2 -> 1.25.2
     newpkg ∅ -> 2.0
     oldpkg 1.0 -> ∅
+    zed-editor 1.24.2 -> 1.25.2
   attr nixosConfigurations.example._module.args.pkgs.unstable.zed-editor: 1.24.2 -> 1.25.2
   cost: 721 to build, 671 to fetch (3.0 GiB download, 8.4 GiB unpacked)
 warning: the delta is the build-time derivation graph, not the runtime closure

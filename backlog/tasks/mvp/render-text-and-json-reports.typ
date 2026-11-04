@@ -69,6 +69,7 @@ Source of truth: `docs/design.md` sections Sequence and JSON schema;
 - `src/report.rs`
 - `src/lib.rs`
 - `src/main.rs`
+- `docs/report.md`
 - `schema/report.schema.json`
 - `tests/it/report.rs`
 - `tests/it/main.rs`

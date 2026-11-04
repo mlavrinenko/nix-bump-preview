@@ -31,11 +31,11 @@ any Nix call.
 | `--no-delta` | Skip the package delta and its Nix call |
 | `--no-cost` | Skip the build and fetch cost and its Nix call |
 | `--exit-code` | Exit 1 when a change or build cost exists, else 0 |
-| `--nix-bin <PATH>` | Nix executable, default `nix`; flag wins over `NIX_BIN` |
-| `--print-schema` | Print the JSON schema and exit; hidden developer flag |
+| `--nix-bin <PATH>` | Hidden. Nix executable, default `nix`; flag wins over `NIX_BIN` |
+| `--print-schema` | Hidden. Print the JSON schema and exit 0; no other argument is required |
 | `-h, --help`, `-V, --version` | Standard |
 
-`--input` or `--all` is required unless `--lock-file` is given. `--lock-file`
+`--input` or `--all` is required unless `--lock-file` or `--print-schema` is given. `--print-schema` is handled before validation and exits 0. `--lock-file`
 with `--input` or `--all` is an error. `--keep-lock` with `--lock-file` is an
 error. `--keep-lock` creates missing parent directories and overwrites an
 existing file. The temp lock lives in the system temp directory and is removed

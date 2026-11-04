@@ -82,6 +82,7 @@ scopes:
     - ".mindtape/templates/**"
     - "docs/goals.md"
     - "docs/design.md"
+    - "docs/report.md"
 
   # `just crap` reads the lcov `just cover` wrote. It is gitignored (it lives
   # under target/), which is exactly why it is spelled as a LITERAL path: mmz's

@@ -55,9 +55,10 @@ Nix calls, and Safety invariants.
   URLs, missing directories, and missing locks exit 2.
 - Read the before lock from `<flake>/flake.lock`. Report every selected input
   with a `changed` boolean. `changed` means the resolved `locked` object
-  differs in any field. Missing `lastModified` or `narHash` is omitted, not
-  invented. Sort inputs by name. With `--lock-file`, every root input is
-  selected; with `--input`, only the named inputs; with `--all`, every root.
+  differs in any field. Missing `rev`, `lastModified`, or `narHash` is omitted,
+  not invented; a path input without `rev` must serialize. Sort inputs by name.
+  With `--lock-file`, every root input is selected; with `--input`, only the
+  named inputs; with `--all`, every root.
 - The temporary lock is removed on success and on failure. A fixture proves
   the before `flake.lock` keeps its bytes and mtime after a successful run and
   after a failed run.
@@ -83,5 +84,5 @@ Nix calls, and Safety invariants.
 - `tests/it/lock.rs`
 - `tests/it/main.rs`
 - `tests/fixtures/fake-nix`
-- `tests/fixtures/locks/`
+- `tests/fixtures/locks/` (including a path input with no `rev`)
 - `outdatty.lock`

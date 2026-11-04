@@ -19,7 +19,7 @@ groups:
       .just/scripts/wt-carry-lcov.sh: 8029a70af112114038526ec8d9024911b3a02f86c4c50c78cf7174d092852d1b
       .just/scripts/wt-lock.sh: bffd3f7179331f0216babfb9361b8b5e278eedb0f367a7ba163aec5c0e913b52
       .just/scripts/wt-tasks.sh: 976cf0f488e5f96f9cb906e2a83d696d0b0107f2b74edc90fcb301c165df3d14
-      .mmz/config.yaml: 9c9399acde13145062e78321f41fbff3d8325a1c22d4629ff1487c9a2ac151ce
+      .mmz/config.yaml: 80c0e80f50b3e9a2718181ca42b89a7b549e9335a379f5c1b2e60777492b6b7b
       Justfile: 48d1dad72efa4d5ba309a5cc889cac31ac38b4cad6851132585706de9acb31d6
       flake.nix: abf19e16ee253fbee69f5dc07cd8e29354b870a4cc73428ba37cb5b8b88b4af3
       release.toml: 3474c8b3a3834220a00e31b084e769d8ca3cb60095280f6b6e70619723b5e021
@@ -28,9 +28,9 @@ groups:
       CONTRIBUTING.md: b81b5d048e534b2a50e838da59664df3ca0610435cc49a5551bc31eab9ee57e8
   product-docs:
     source:
-      docs/design.md: a3b7080db07a6885b3a9218127141df95d65e05056ece8b828b920fca6f318eb
+      docs/design.md: 77975d05a517b0c210663f8f4a1c60d5b86e228db54206f93efd39e21d5639f9
       docs/goals.md: 764a255aa814caeba25f18e16b3d2184b9bee1dbb0da43fe0b639dbf2ba4c84e
-      docs/report.md: c150a50b6a01a3d818d8fadaa49e4f1a52d99bc12f8a2e6b811aca64f7781e09
+      docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
     dependents:
       AGENTS.md: cbc27f76d63c94ca823da4eff43e4c06470be9b5c53a38229f372394d3a2b674
       README.md: 910ad98e5ea0f4595e02aeb9baf1258ff6f853916f23b239526bbc616171ca1c
