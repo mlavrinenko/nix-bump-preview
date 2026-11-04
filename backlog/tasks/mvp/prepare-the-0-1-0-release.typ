@@ -38,7 +38,7 @@
   kind: "docs",
   assignee: "agent",
   estimate: (src-files: 0),
-  status: wip(2026, 11, 5),
+  status: done(2026, 11, 5),
 )
 
 == Summary
