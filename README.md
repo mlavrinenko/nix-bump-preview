@@ -78,7 +78,14 @@ jq '.installables[] | {attr, changes: .delta.changes, cost}' \
 
 ## Install
 
-Add the flake as an input:
+```console
+$ cargo install nix-bump-preview
+```
+
+Prebuilt binaries are on the
+[latest release](https://github.com/mlavrinenko/nix-bump-preview/releases/latest).
+
+The flake is also an input:
 
 ```nix
 inputs.nix-bump-preview.url = "github:mlavrinenko/nix-bump-preview";

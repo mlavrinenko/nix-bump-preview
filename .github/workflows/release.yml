@@ -157,6 +157,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      HAS_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v6.0.3
         with:
@@ -168,10 +170,13 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2.9.1
 
-      # Short-lived token from crates.io Trusted Publishing, so no registry
-      # secret expires between releases.
+      # crates.io attaches a Trusted Publisher only to a crate that already
+      # exists, so the first publish uses a scoped CARGO_REGISTRY_TOKEN. Once
+      # the crate exists, add the publisher and delete the secret; later tags
+      # take this OIDC path and keep no credential.
       - name: Authenticate with crates.io
         id: auth
+        if: env.HAS_REGISTRY_TOKEN != 'true'
         uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
 
       # A version already on crates.io (a re-run, or a hand `cargo publish`) is
@@ -181,7 +186,7 @@ jobs:
       # `--locked` keeps the published build reproducible; requires a committed Cargo.lock.
       - name: Publish unless already on crates.io
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN || steps.auth.outputs.token }}
           CRATE: ${{ needs.meta.outputs.binary }}
           VERSION: ${{ needs.meta.outputs.version }}
         run: |

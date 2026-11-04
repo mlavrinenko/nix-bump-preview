@@ -16,16 +16,18 @@
   <p>Preview a Nix flake input bump: package version deltas and build cost, without building or switching</p>
 
   <h2>Install</h2>
+  <pre><code>cargo install nix-bump-preview</code></pre>
+
+  <p>Prebuilt binaries are on the
+    <a href="https://github.com/mlavrinenko/nix-bump-preview/releases/latest">latest release</a>.
+    The flake is also an input:</p>
+
   <pre><code>inputs.nix-bump-preview.url = "github:mlavrinenko/nix-bump-preview";</code></pre>
 
   <p>Use <code>inputs.nix-bump-preview.packages.${pkgs.stdenv.hostPlatform.system}.default</code>
     in <code>home.packages</code> or <code>environment.systemPackages</code>, or run it directly:</p>
 
   <pre><code>nix run github:mlavrinenko/nix-bump-preview -- --input unstable --installable ...</code></pre>
-
-  <p>Binaries are on the
-    <a href="https://github.com/mlavrinenko/nix-bump-preview/releases/latest">latest release</a>.
-  </p>
 
   <footer>
     <p><a href="https://github.com/mlavrinenko/nix-bump-preview">GitHub</a></p>

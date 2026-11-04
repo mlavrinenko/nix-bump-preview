@@ -7,8 +7,8 @@ groups:
       src/lib.rs: 1dd9a818a29da4405fdffbe49bc4a9972b6855d7c440c2fcd928f03b8c134bfd
       src/main.rs: ea53d3b088c4ebe740e1dc0af458bba0e639240047dd8423c6bdd0ce19662d4d
     dependents:
-      README.md: 98980b5c813fff06651ca01525276b8b14b108b8cfc99bf51144733d2999e32a
-      www/index.html: 27a18efff61883c0dcc71439ec74113510d47929cc90a7a3f42b0cf427397e16
+      README.md: 73e484e412018929f4a124ef27907dca79a9bad32395f506b517620e38ef0779
+      www/index.html: f9ebdf99568eed66958134b8d9882d0adf656369ab476f4c79e1113342a58194
   cost-pipeline:
     source:
       src/cost.rs: dd49329b75916d21af9f771eb280956e3da9ed3ac008c929eb27085c6f946a01
@@ -49,8 +49,8 @@ groups:
       flake.nix: abf19e16ee253fbee69f5dc07cd8e29354b870a4cc73428ba37cb5b8b88b4af3
       release.toml: 3474c8b3a3834220a00e31b084e769d8ca3cb60095280f6b6e70619723b5e021
     dependents:
-      AGENTS.md: 7a5c21625eae90bf70e85763a5a81624732dcced38c693fb50cbd72e03f765ee
-      CONTRIBUTING.md: 37e3f0bf4f9f448f4b27959591d3575944403054132e28ba8688105c3d50a5a9
+      AGENTS.md: 48a62982af83df0a2261ec8e5136c7e7f7e41641ded44b87af30844da3069556
+      CONTRIBUTING.md: ca47587b7b8e83e13d44f17723d46c06aa29a6df2030de39bccde0d71441dc83
   nix-pipeline:
     source:
       src/eval.rs: 427fb09851d518367b5b7bd3ff6a9bb34756cea158aa2b323f04ff1db3932d93
@@ -71,20 +71,20 @@ groups:
       .mindtape/config.toml: 242ce940981dddcc0ce27f3586e53c8759ac53abdec6620240a2c920d3bd5a2f
       .mindtape/templates/task.typ: dc2d7a306d2a40d01418b3e52d09877a4bb2b16683b80c6b4ca194f5475b1686
       .mmz/config.yaml: 861f69396d3f3e601d40cf95a187b50d730e9848de57c7f5958911a1904325ce
-      AGENTS.md: 7a5c21625eae90bf70e85763a5a81624732dcced38c693fb50cbd72e03f765ee
-      README.md: 98980b5c813fff06651ca01525276b8b14b108b8cfc99bf51144733d2999e32a
-      www/index.html: 27a18efff61883c0dcc71439ec74113510d47929cc90a7a3f42b0cf427397e16
+      AGENTS.md: 48a62982af83df0a2261ec8e5136c7e7f7e41641ded44b87af30844da3069556
+      README.md: 73e484e412018929f4a124ef27907dca79a9bad32395f506b517620e38ef0779
+      www/index.html: f9ebdf99568eed66958134b8d9882d0adf656369ab476f4c79e1113342a58194
   release-notes:
     source:
       Cargo.toml: 492b6cdbf6b9c101b10c646a432869ac5103c7876304927b5ba4c781a8fa2b7f
     dependents:
-      CHANGELOG.md: 7d27a83564e5b81ff8a8ed697af6d49e1ebc739e5dc1d7b3ade0aaa4d4051603
+      CHANGELOG.md: a0b18686c3a385b5e5de1d2450b9a443e5f8776396fe0116d85a6216bbcadd1d
   report-contract:
     source:
       src/report.rs: d393c6991db6b51e9162143e77d04a91c6cd10d2473895d6cc26f991c496fcb5
       src/report_tests.rs: 495adce9a60fe2fdbdfd3282e66218fd6ff73a2dfe041b1f0233803869927432
     dependents:
-      README.md: 98980b5c813fff06651ca01525276b8b14b108b8cfc99bf51144733d2999e32a
+      README.md: 73e484e412018929f4a124ef27907dca79a9bad32395f506b517620e38ef0779
       docs/report.md: 8610a26d70ad6003ea191bcbd4d099f728aa6c37e9d447ac8df6c16ca1dfce06
       schema/report.schema.json: 374a85937ab1a9db2b9ec6567d71886251aed2e0b17d53c1466951576df1660a
       tests/fixtures/reports/example.json: 4399e47dc06fc3aa4a9f2822b132aba08c41b86ba1c49f1dfc15e8ae85dcc68d

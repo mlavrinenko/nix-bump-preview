@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   format and keeps one line per failing function.
 - `just release` works against an empty origin. The hook no longer refuses a
   repository whose first push creates `main`.
+- The release workflow accepts a scoped `CARGO_REGISTRY_TOKEN` for the first
+  publish, when crates.io cannot have a Trusted Publisher yet, then switches to
+  OIDC once the secret is gone.
 
 ### Added
 

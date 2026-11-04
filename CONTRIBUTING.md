@@ -155,10 +155,12 @@ under `[Unreleased]`. [cargo-release](https://github.com/crate-ci/cargo-release)
 `.just/scripts/release-hook.sh`, which holds every refusal, and commits. The
 recipe pushes `main`, waits for `ci.yml` on it (`.just/scripts/release-ci.sh`)
 and tags only if it is green. After a red run, fix `main` and re-run: the bump
-stays done. The tag pushes through crates.io Trusted Publishing, so configure a
-Trusted Publisher (owner, repo, workflow `release.yml`, environment `crates-io`)
-before the first tag; no registry token secret exists. Never `cargo publish` by
-hand.
+stays done. The tag publishes through crates.io Trusted Publishing. A new crate
+cannot configure a publisher before it exists, so the first release uses a
+scoped `CARGO_REGISTRY_TOKEN` secret (repository or `crates-io` environment),
+then you add the Trusted Publisher (owner, repo, workflow `release.yml`,
+environment `crates-io`) and delete the secret. Later releases need none. Never
+`cargo publish` by hand.
 
 ## MSRV
 
