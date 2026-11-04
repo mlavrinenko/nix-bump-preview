@@ -41,13 +41,15 @@ groups:
       - README.md
       - www/index.html
 
-  # The lock resolver and the shared Nix runner implement the command and
-  # safety contract. Touching either flags docs/design.md for a review.
+  # The lock resolver, the shared Nix runner, and the derivation evaluator
+  # implement the command and safety contract. Touching one flags
+  # docs/design.md for a review.
   - name: nix-pipeline
     source:
       - "{src,crates/*/src}/lock.rs"
       - "{src,crates/*/src}/lock_tests.rs"
       - "{src,crates/*/src}/nix.rs"
+      - "{src,crates/*/src}/eval.rs"
     dependents:
       - docs/design.md
 

@@ -17,3 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   resolution, the fake-Nix test fixture, and fixture locks proving `flake.lock`
   stays untouched. Follows roots resolve to their target, and an empty root is
   a valid lock.
+- Installable and attr evaluation against the before and proposed locks, with
+  the exact `nix path-info` and `nix eval` argv and no build or activation
+  call.

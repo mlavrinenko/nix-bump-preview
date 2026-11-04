@@ -4,7 +4,7 @@ groups:
   cli-docs:
     source:
       src/cli.rs: e5b807e89d1930bc8b4954e55765980e55a2809a5a0899f556eafa9ac4267144
-      src/lib.rs: 042c2c1e597c63a800e9eda60f2c7ef9181e8f236ac69ca885871af2cfe5e843
+      src/lib.rs: f4cf0740e65eee81d110c1065798c8e3b31619266ce0e3901241c1c6f46e2240
       src/main.rs: 7c64b7f1829dce31910b8970694cac08fa91ae403e39a4d02be2c59674925f8b
     dependents:
       README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
@@ -29,6 +29,7 @@ groups:
       CONTRIBUTING.md: b81b5d048e534b2a50e838da59664df3ca0610435cc49a5551bc31eab9ee57e8
   nix-pipeline:
     source:
+      src/eval.rs: 427fb09851d518367b5b7bd3ff6a9bb34756cea158aa2b323f04ff1db3932d93
       src/lock.rs: 3e8501edfb5cb7d6806660de79a9be793ed5d8e01dcddd5e6eb79e060e238b4b
       src/lock_tests.rs: 42ca052af27a1728225b8c6eace86a78bf50f08f00c542676351c287287eb529
       src/nix.rs: 7565a70c2075faab2118025a33753c152407bc0caee0cacff8ba8eb73ed156e5
@@ -47,7 +48,7 @@ groups:
     source:
       Cargo.toml: 512ba7444419f2880bf44b2125c341b21f1a605d88d3ba5033f9fafc69696f1a
     dependents:
-      CHANGELOG.md: 8ee41ef07adba3f21df4772c10816fd0f064ab34a680f405b41ec942c3ae080d
+      CHANGELOG.md: 58329d50d94b4ec423a25035a94350c10df609bc4cbbc7495e41ab78ef27753e
   report-contract:
     source:
       src/report.rs: bc43ad4f32298532041c7077cce7d582f72f9a8f074bda3e22fd1ada027cfb63

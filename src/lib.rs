@@ -1,6 +1,7 @@
 //! Preview a Nix flake input bump without building or switching.
 
 pub mod cli;
+pub mod eval;
 pub mod lock;
 pub mod nix;
 pub mod report;

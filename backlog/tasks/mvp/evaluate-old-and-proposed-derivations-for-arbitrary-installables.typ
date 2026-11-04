@@ -8,7 +8,7 @@
   kind: "feat",
   assignee: "agent",
   estimate: (src-files: 3),
-  status: proposed(2026, 11, 4),
+  status: wip(2026, 11, 4),
   links: parent("ship-the-nix-bump-preview-mvp.typ")
     + depends-on("resolve-a-proposed-lock-without-writing-flake-lock.typ"),
 )

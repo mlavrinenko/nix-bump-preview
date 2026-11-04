@@ -72,6 +72,20 @@ impl<'a> Response<'a> {
             lock: None,
         }
     }
+
+    pub fn stdout(stdout: &'a str) -> Self {
+        Self {
+            status: 0,
+            stdout,
+            stderr: "",
+            lock: None,
+        }
+    }
+
+    pub fn with_stderr(mut self, stderr: &'a str) -> Self {
+        self.stderr = stderr;
+        self
+    }
 }
 
 fn write_response(scenario: &Path, key: &str, index: u32, response: &Response) {
@@ -155,7 +169,11 @@ impl Harness {
     }
 
     pub fn respond(&self, index: u32, response: &Response) {
-        write_response(&self.scenario, "flake-update", index, response);
+        self.respond_with("flake-update", index, response);
+    }
+
+    pub fn respond_with(&self, key: &str, index: u32, response: &Response) {
+        write_response(&self.scenario, key, index, response);
     }
 
     pub fn nix(&self) -> Nix {
