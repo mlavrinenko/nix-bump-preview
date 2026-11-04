@@ -20,3 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Installable and attr evaluation against the before and proposed locks, with
   the exact `nix path-info` and `nix eval` argv and no build or activation
   call.
+- The build-graph package delta parser for
+  `nix store diff-closures --derivation`, grouping versions by package,
+  accepting both arrow glyphs and the empty-version markers, stripping size
+  suffixes, and warning about malformed lines.

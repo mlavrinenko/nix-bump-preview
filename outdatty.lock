@@ -4,11 +4,17 @@ groups:
   cli-docs:
     source:
       src/cli.rs: e5b807e89d1930bc8b4954e55765980e55a2809a5a0899f556eafa9ac4267144
-      src/lib.rs: f4cf0740e65eee81d110c1065798c8e3b31619266ce0e3901241c1c6f46e2240
+      src/lib.rs: 288fe46815151bdb557abbcbf72e213d260ee257083d3bf3f8d1471493e45f60
       src/main.rs: 7c64b7f1829dce31910b8970694cac08fa91ae403e39a4d02be2c59674925f8b
     dependents:
       README.md: dc89e11881d606000c9ad30d82efbbc2e66c89957871d6d12c5eb51c2a098c40
       www/index.html: 8ff098c5ac4262987bac998b890112af72e5494a59bd8f280e095fe0d841e932
+  delta-pipeline:
+    source:
+      src/delta.rs: 7ec107842d96b136393de403a611c2bbae8d1e319b4b1ef4b63e35756731900f
+    dependents:
+      docs/design.md: 6abf30e3d1e1801d63ac413e4b34b8a2790d86cfb083d01a568480a63d45800e
+      docs/report.md: 3b24090c20996f350108d04f0effd8d69f52b0df0b4f7666fd67da651436bf3c
   dev-docs:
     source:
       .config/nextest.toml: ec97d2444d9bf38aae8499d53eac3ffbbab47593637e3a324452ee72bec0ef0b
@@ -48,7 +54,7 @@ groups:
     source:
       Cargo.toml: 512ba7444419f2880bf44b2125c341b21f1a605d88d3ba5033f9fafc69696f1a
     dependents:
-      CHANGELOG.md: 58329d50d94b4ec423a25035a94350c10df609bc4cbbc7495e41ab78ef27753e
+      CHANGELOG.md: 34734fadd9551373aef22cbf4da152d5e858df34d89b6e3c66e2538c11273625
   report-contract:
     source:
       src/report.rs: bc43ad4f32298532041c7077cce7d582f72f9a8f074bda3e22fd1ada027cfb63
