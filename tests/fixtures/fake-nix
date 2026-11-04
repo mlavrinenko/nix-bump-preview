@@ -1,0 +1,124 @@
+#!/bin/sh
+# Fake Nix for nix-bump-preview tests.
+#
+# Environment:
+#   FAKE_NIX_SCENARIO  directory holding scripted responses (required)
+#   FAKE_NIX_LOG       argv log path (default: $FAKE_NIX_SCENARIO/argv.log)
+#
+# Every invocation appends a record to the log: a delimiter line followed by
+# one line per argument. The program name itself is not logged.
+#
+# A response lives in $FAKE_NIX_SCENARIO/<command>/<call-number>/ (falling back
+# to <command>/default, then default) and may contain:
+#   status  exit status, default 0
+#   stdout  bytes printed on stdout, default empty
+#   stderr  bytes printed on stderr, default empty
+#   lock    for `flake update`, copied to the --output-lock-file path
+#
+# An unsupported command or a missing response exits 90 with a diagnostic.
+
+set -eu
+
+scenario=${FAKE_NIX_SCENARIO:?FAKE_NIX_SCENARIO must name a scenario directory}
+log=${FAKE_NIX_LOG:-$scenario/argv.log}
+
+mkdir -p "$(dirname "$log")" "$scenario/.counters"
+
+{
+  printf '%s\n' '=== invocation ==='
+  for arg in "$@"; do
+    printf '%s\n' "$arg"
+  done
+} >> "$log"
+
+fail() {
+  printf 'fake-nix: %s\n' "$*" >&2
+  exit 90
+}
+
+if [ "$#" -eq 0 ]; then
+  fail "no arguments"
+fi
+
+case $1 in
+  flake)
+    if [ "$#" -lt 2 ] || [ "$2" != update ]; then
+      fail "unsupported flake subcommand"
+    fi
+    key=flake-update
+    ;;
+  path-info)
+    key=path-info
+    ;;
+  store)
+    if [ "$#" -lt 2 ] || [ "$2" != diff-closures ]; then
+      fail "unsupported store subcommand"
+    fi
+    key=store-diff-closures
+    ;;
+  build)
+    key=build
+    ;;
+  eval)
+    key=eval
+    ;;
+  *)
+    fail "unsupported command: $1"
+    ;;
+esac
+
+counter_file=$scenario/.counters/$key
+count=0
+if [ -f "$counter_file" ]; then
+  count=$(cat "$counter_file")
+fi
+count=$((count + 1))
+printf '%s\n' "$count" > "$counter_file"
+
+dir=$scenario/$key/$count
+if [ ! -d "$dir" ]; then
+  dir=$scenario/$key/default
+fi
+if [ ! -d "$dir" ]; then
+  dir=$scenario/default
+fi
+if [ ! -d "$dir" ]; then
+  fail "no scenario for $key invocation $count under $scenario"
+fi
+
+status=0
+if [ -f "$dir/status" ]; then
+  status=$(cat "$dir/status")
+fi
+case $status in
+  ''|*[!0-9]*)
+    fail "invalid status '$status' in $dir"
+    ;;
+esac
+
+if [ "$key" = flake-update ] && [ "$status" -eq 0 ]; then
+  output_lock=
+  previous=
+  for arg in "$@"; do
+    if [ "$previous" = "--output-lock-file" ]; then
+      output_lock=$arg
+    fi
+    previous=$arg
+  done
+  if [ -z "$output_lock" ]; then
+    fail "flake update needs --output-lock-file"
+  fi
+  if [ ! -f "$dir/lock" ]; then
+    fail "successful flake update needs a canned lock in $dir"
+  fi
+  cp "$dir/lock" "$output_lock"
+fi
+
+if [ -f "$dir/stdout" ]; then
+  cat "$dir/stdout"
+fi
+if [ -f "$dir/stderr" ]; then
+  cat "$dir/stderr" >&2
+fi
+
+exit "$status"

@@ -1,0 +1,13 @@
+{
+  "nodes": {
+    "root": {
+      "inputs": {
+        "dep": {
+          "follows": "nixpkgs"
+        }
+      }
+    }
+  },
+  "root": "root",
+  "version": 5
+}

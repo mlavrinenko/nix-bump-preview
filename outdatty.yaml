@@ -41,6 +41,16 @@ groups:
       - README.md
       - www/index.html
 
+  # The lock resolver and the shared Nix runner implement the command and
+  # safety contract. Touching either flags docs/design.md for a review.
+  - name: nix-pipeline
+    source:
+      - "{src,crates/*/src}/lock.rs"
+      - "{src,crates/*/src}/lock_tests.rs"
+      - "{src,crates/*/src}/nix.rs"
+    dependents:
+      - docs/design.md
+
   # The report types produce the committed JSON schema, and the report contract
   # and README describe the same object. A type change flags each dependent.
   - name: report-contract
